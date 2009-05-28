@@ -1,30 +1,38 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
     <title>nymphormation</title>
+    
+    <!--[if IE]>
+
+      <script>
+        // allow IE to recognize HTMl5 elements
+        document.createElement('section');
+        document.createElement('article');
+        document.createElement('aside');
+        document.createElement('footer');
+        document.createElement('header');
+        document.createElement('nav');
+        document.createElement('time');
+
+      </script>
+      <![endif]-->
+    
     <link rel="stylesheet" href="css/nymphormation.css" type="text/css">
-    <link rel="stylesheet" href="css/smoothness/jquery-ui-custom.css?1.7.1" type="text/css">
-    <script src="/_utils/script/json2.js"></script>
-    <script src="js/jquery.js?1.3.2"></script>
-    <script src="js/jquery-ui-custom.js?1.7.1"></script>
-    <script src="js/jquery-ui-i18n.js?1.7.1"></script>
-    <script src="/_utils/script/jquery.couch.js?0.9.0"></script>
-    <script src="/_utils/script/jquery.couchapp.js"></script>
-    <script src="js/sammy.js"></script>
-    <script src="js/pure.js"></script>
-    <script src="js/nymphormation.js"></script>
-     
+    <link rel="stylesheet" href="css/humanity/jquery-ui-custom.css?1.7.1" type="text/css">
+    
   </head>
   <body>
     <div id="loginpane">
       <div id="version"></div>
 
       <div id="not_logged_in" style="display: none;">
-          <form onsubmit="bespin.user.login(); return false;">
+          <form id="flogin" method="post">
               <input id="loginbutton" type="image" src="images/splash_btn_login.gif" />
-              <div id="login-holder"><span id="login_label"><a href="#" onclick="bespin.user.register.showForm();">Sign up</a> or log in:</span>
+              <div id="login-holder"><span id="login_label"><a href="#" id="signup">Sign up</a> or log in:</span>
 
-                  <label for="username">Username: </label><input id="username" type="text" /> <label id="psw-label" for="password">Password: </label><input id="password" type="password" maxlength="20"/> <div id="status" style="display: none;"></div>
+                  <label for="login_username">Username: </label><input id="login_username" name="login_username" type="text" /> <label id="psw-label" for="login_password">Password: </label><input id="login_password" type="password" maxlength="20"/> <div id="status" style="display: none;"></div>
               </div>
           </form>
       </div>
@@ -32,12 +40,51 @@
         <div>
           Welcome back, <span id="display_username"></span>!
           Go to the <a href="dashboard.html">dashboard</a> to start coding.
-          You can also <a href="#" onclick="bespin.user.logout()">logout</a>.
+          You can also <a href="#" id="logou">logout</a>.
         </div>
 
       </div>
     </div>
     
+    
+    <div id="dialog" title="Create new user">
+    	<p id="validateTips">All form fields are required.</p>
+
+    	<form>
+    	<fieldset>
+    		<label for="fullname">Full name</label>
+    		<input type="text" name="fullname" id="fullname" class="text ui-widget-content ui-corner-all" />
+    		<label for="username">Username</label>
+    		<input type="text" name="username" id="username" class="text ui-widget-content ui-corner-all" />
+    		<label for="password">Password</label>
+    		<input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
+    		<label for="email">Email</label>
+    		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
+    	</fieldset>
+    	</form>
+    </div>
+    
+     <!-- begin script tags -->
+      <script src="/_utils/script/json2.js"></script>
+      <script src="js/jquery.js?1.3.2"></script>
+      <script src="js/jquery-ui-custom.js?1.7.1"></script>
+      <script src="js/jquery-ui-i18n.js?1.7.1"></script>
+      <script src="/_utils/script/jquery.cookies.js?0.9.0"></script>
+      <script src="/_utils/script/jquery.couch.js?0.9.0"></script>
+      <script src="vendor/couchapp/jquery.couchapp.js?0.3"></script>
+      <script src="vendor/couchapp/sha1.js"></script>
+      <script src="js/sammy.js"></script>
+      <script src="js/pure.js"></script>
+      <script src="js/nymphormation.js"></script>
+      <!-- end script tzgd -->
+      
+      <script>
+        $(document).ready(function() {
+          $.CouchApp(function(app) {
+            new $.nymphormation.FPIndex(app);
+          });
+        })
+      </script>
     
   </body>
  

@@ -1,0 +1,36 @@
+body {
+    background-color: #EEEEEE;
+    color: #666666;
+    font-family: Georgia,"Times New Roman",Times,serif;
+    font-size: 11px;
+    line-height: 14px;
+    margin: 0 0 100px;
+    padding: 25px 25px 50px;
+}
+a {
+    color: #666666;
+    text-decoration: underline;
+}
+a:hover {
+    color: #CF1F36;
+    text-decoration: underline;
+}
+
+
+#dialog label, input {
+    display: block;
+}
+#dialog input.text {
+    margin-bottom: 12px;
+    width: 95%;
+    padding: .4em;
+}
+#dialog fieldset {
+    padding: 0;
+    border: 0;
+    margin-top: 25px;
+}
+#dialog h1 {
+    font-size: 1.2em;
+    margin: .6em 0;
+}
