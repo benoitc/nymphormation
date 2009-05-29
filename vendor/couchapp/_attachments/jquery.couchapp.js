@@ -154,7 +154,10 @@
       app({
         showPath : function(funcname, docid) {
           // I wish this was shared with path.js...
-          return '/'+[dbname, '_design', dname, '_show', funcname, docid].join('/')
+          if (docid)
+            return '/'+[dbname, '_design', dname, '_show', funcname, docid].join('/')
+          else
+            return '/'+[dbname, '_design', dname, '_show', funcname].join('/')
         },
         listPath : function(funcname, viewname) {
           return '/'+[dbname, '_design', dname, '_list', funcname, viewname].join('/')
@@ -186,6 +189,7 @@
             loggedOut && loggedOut();
           }
         },
+        name: dname,
         db : db,
         design : design,
         view : design.view,

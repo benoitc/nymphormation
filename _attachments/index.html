@@ -28,11 +28,11 @@
       <div id="version"></div>
 
       <div id="not_logged_in" style="display: none;">
-          <form id="flogin" method="post">
-              <input id="loginbutton" type="image" src="images/splash_btn_login.gif" />
+          <form id="flogin">
+              
               <div id="login-holder"><span id="login_label"><a href="#" id="signup">Sign up</a> or log in:</span>
 
-                  <label for="login_username">Username: </label><input id="login_username" name="login_username" type="text" /> <label id="psw-label" for="login_password">Password: </label><input id="login_password" type="password" maxlength="20"/> <div id="status" style="display: none;"></div>
+                  <label for="login_username">Username: </label><input id="login_username" type="text" /> <label id="psw-label" for="login_password">Password: </label><input id="login_password" type="password" maxlength="20"/> <input id="loginbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="login"> <div id="status" style="display: none;"></div>
               </div>
           </form>
       </div>
@@ -40,13 +40,13 @@
         <div>
           Welcome back, <span id="display_username"></span>!
           Go to the <a href="dashboard.html">dashboard</a> to start coding.
-          You can also <a href="#" id="logou">logout</a>.
+          You can also <a href="#" id="logout">logout</a>.
         </div>
 
       </div>
     </div>
-    
-    
+    <div id="test">
+    </div>
     <div id="dialog" title="Create new user">
     	<p id="validateTips">All form fields are required.</p>
 
