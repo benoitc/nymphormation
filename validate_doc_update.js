@@ -10,6 +10,9 @@ function (newDoc, oldDoc, userCtx) {
   if (userCtx.roles.indexOf('_admin') == -1) {
     // admin can edit anything, only check when not admin...
     if (newDoc._deleted) 
-      forbidden("You may not delete a doc.");     
+      forbidden("You may not delete a doc.");
+    
+    if (typeof newDoc['roles'] != "undefined" || newDoc['roles'])
+      forbidden("You can't set roles. Only an admin can.");
   }
 }

@@ -11,6 +11,11 @@ function(doc, req) {
   };
   
   return {
+      headers: {
+        "Cache-Control": "no-cache, must-revalidate",
+        "Pragma": "no-cache",
+        "Last-Modified": new Date().toUTCString()
+      },
       json : resp
   };
 }
