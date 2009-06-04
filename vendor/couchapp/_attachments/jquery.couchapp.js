@@ -51,7 +51,7 @@
       // docForm applies CouchDB behavior to HTML forms.
       function docForm(formSelector, opts) {
         var localFormDoc = {};
-        opts = opts || {};
+        var opts = opts || {};
         opts.fields = opts.fields || [];
         
         // turn the form into deep json
@@ -76,8 +76,10 @@
         // Apply the behavior
         $(formSelector).submit(function(e) {
           e.preventDefault();
+          localFormDoc = {};
           // formToDeepJSON acts on localFormDoc by reference
           formToDeepJSON(this, opts.fields, localFormDoc);
+          if (opts.validForm && !opts.validForm(localFormDoc)) return false;
           if (opts.beforeSave) opts.beforeSave(localFormDoc);
           db.saveDoc(localFormDoc, {
             success : function(resp) {
@@ -167,27 +169,14 @@
             replace(/\-*$/,'').replace(/^\-*/,'').
             replace(/\-{2,}/,'-');
         },
-        attemptLogin : function(win, fail) {
-          // depends on nasty hack in blog validation function
-          db.saveDoc({"author":"_self"}, { error: function(s, e, r) {
-            var namep = r.split(':');
-            if (namep[0] == '_self') {
-              login = namep.pop();
-              $.cookies.set("login", login, '/'+dbname)
-              win && win(login);
+        isLogged: function(loggedIn, loggedOut) {
+          $.getJSON(this.showPath('userctx', ""), function(data) {
+            if (data.is_logged) {
+              loggedIn && loggedIn(data);
             } else {
-              $.cookies.set("login", "", '/'+dbname)
-              fail && fail(s, e, r);
+              loggedOut && loggedOut();
             }
-          }});        
-        },
-        loggedInNow : function(loggedIn, loggedOut) {
-          login = login || $.cookies.get("login");
-          if (login) {
-            loggedIn && loggedIn(login);
-          } else {
-            loggedOut && loggedOut();
-          }
+          });
         },
         name: dname,
         db : db,

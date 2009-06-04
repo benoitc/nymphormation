@@ -29,7 +29,9 @@
 
       <div id="not_logged_in" style="display: none;">
           <form id="flogin">
+              
               <div id="login-holder"><span id="login_label"><a href="#" id="signup">Sign up</a> or log in:</span>
+
                   <label for="login_username">Username: </label><input id="login_username" type="text" /> <label id="psw-label" for="login_password">Password: </label><input id="login_password" type="password" maxlength="20"/> <input id="loginbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="login"> <div id="status" style="display: none;"></div>
               </div>
           </form>
@@ -37,7 +39,7 @@
       <div id="logged_in" style="display: none;">
         <nav id="user_actions">
             <ul>
-                <li><a href="_show/news">Add an entry</a></li>
+                <li><a class="add" href="#">Add an entry</a></li>
             </ul>
         </nav>
         <div>
@@ -47,26 +49,11 @@
 
       </div>
     </div>
-    <div id="test">
-    </div>
-    <div id="addEntry" title="" style="display: none;">
-        <h2>Submit</h2>
-        <form name="fentry" id="fentry" method="POST" action=".">
-            <fieldset>
-            <div class="form-row"><label for="title">title</label>
-            <input type="text" name="title" id="title" class="text ui-widget-content ui-corner-all"></div>
-            <div class="form-row"><label for="url">url</label>
-            <input type="text" name="url" id="url" class="text ui-widget-content ui-corner-all"></div>
-            or
-            <div class="form-row"><textarea name="content" id="content" cols="50" rows="4" /></textarea></div>
-            </fieldser>
-            <input type="submit" id="fsubmit" value="submit" class="nf-button ui-state-default ui-corner-all">
-            
-        </form>
-        <p>Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the comments page. If there is a url, the text will be ignored.</p>
-    </div>
+    <section id="content" title="" style="display: none;">
+        
+    </section>
     <div id="signupdlg" title="Create new user">
-    	<p id="validateTips">All form fields are required.</p>
+    	
 
     	<form>
     	<fieldset>
@@ -84,15 +71,15 @@
     
      <!-- begin script tags -->
       <script src="/_utils/script/json2.js"></script>
-      <script src="js/jquery.js?1.3.2"></script>
-      <script src="js/jquery-ui-custom.js?1.7.1"></script>
-      <script src="js/jquery-ui-i18n.js?1.7.1"></script>
+      <script src="<%= assets %>js/jquery.js?1.3.2"></script>
+      <script src="<%= assets %>js/jquery-ui-custom.js?1.7.1"></script>
+      <script src="<%= assets %>js/jquery-ui-i18n.js?1.7.1"></script>
       <script src="/_utils/script/jquery.cookies.js?0.9.0"></script>
       <script src="/_utils/script/jquery.couch.js?0.9.0"></script>
-      <script src="vendor/couchapp/jquery.couchapp.js?0.3"></script>
-      <script src="vendor/couchapp/sha1.js"></script>
-      <script src="js/pure.js"></script>
-      <script src="js/nymphormation.js"></script>
+      <script src="<%= assets %>vendor/couchapp/jquery.couchapp.js?0.3"></script>
+      <script src="<%= assets %>vendor/couchapp/sha1.js"></script>
+      <script src="<%= assets %>js/pure.js"></script>
+      <script src="<%= assets %>js/nymphormation.js"></script>
       <!-- end script tzgd -->
       
       <script>

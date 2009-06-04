@@ -1,5 +1,6 @@
 function(doc, req) {
-  if (typeof req.cookie['AuthSession'] != "undefined" && req.cookie['AuthSession']) {
+
+  if (typeof req.userCtx['name'] != "undefined" && req.userCtx['name']) {
     is_logged = true;
   } else {
     is_logged = false;

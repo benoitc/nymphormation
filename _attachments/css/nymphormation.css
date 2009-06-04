@@ -2,8 +2,7 @@ body {
     background-color: #EEEEEE;
     color: #666666;
     font-family: Georgia,"Times New Roman",Times,serif;
-    font-size: 11px;
-    line-height: 14px;
+    font-size: 62.5%;
     margin: 0 0 100px;
     padding: 25px 25px 50px;
 }
@@ -17,20 +16,24 @@ a:hover {
 }
 
 
-#dialog label, input {
+#signupdlg label, #signupdlg input {
     display: block;
 }
-#dialog input.text {
+#signupdlg input.text {
     margin-bottom: 12px;
     width: 95%;
     padding: .4em;
 }
-#dialog fieldset {
+#signupdlg fieldset {
     padding: 0;
     border: 0;
     margin-top: 25px;
 }
-#dialog h1 {
+#signupdlg h1 {
     font-size: 1.2em;
     margin: .6em 0;
 }
+
+
+#signupdlg .ui-button { outline: 0; margin:0; padding: .4em 1em .5em; text-decoration:none;  !important; cursor:pointer; position: relative; text-align: center; }
+#signupdlg .ui-dialog .ui-state-highlight, .ui-dialog .ui-state-error { padding: .3em;  }

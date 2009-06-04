@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+    <title>nymphormation</title>
+    
+    <!--[if IE]>
+
+      <script>
+        // allow IE to recognize HTMl5 elements
+        document.createElement('section');
+        document.createElement('article');
+        document.createElement('aside');
+        document.createElement('footer');
+        document.createElement('header');
+        document.createElement('nav');
+        document.createElement('time');
+
+      </script>
+      <![endif]-->
+    
+    <link rel="stylesheet" href="<%= assets %>/css/nymphormation.css" type="text/css">
+    <link rel="stylesheet" href="<%= assets %>/css/humanity/jquery-ui-custom.css?1.7.1" type="text/css">
+    
+  </head>
+  <body>
+    <div id="loginpane">
+      <div id="version"></div>
+
+      <div id="not_logged_in" style="display: none;">
+          <form id="flogin">
+              
+              <div id="login-holder"><span id="login_label"><a href="#" id="signup">Sign up</a> or log in:</span>
+
+                  <label for="login_username">Username: </label><input id="login_username" type="text" /> <label id="psw-label" for="login_password">Password: </label><input id="login_password" type="password" maxlength="20"/> <input id="loginbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="login"> <div id="status" style="display: none;"></div>
+              </div>
+          </form>
+      </div>
+      <div id="logged_in">
+        <div>
+          <span id="display_username"><%= username %></span>, <a href="#" id="logout">logout</a>.
+        </div>
+
+      </div>
+    </div>
+    <section id="edit">
+        <h1>Submit news</h1>
+        <p id="validateTips"></p>
+        
+        <form name="fedit" id="fedit" method="POST" action=".">
+            <fieldset>
+            <div class="form-row"><label for="title">title</label>
+            <input type="text" name="title" id="title" class="text ui-widget-content ui-corner-all"></div>
+            <div class="form-row"><label for="url">url</label>
+            <input type="text" name="url" id="url" class="text ui-widget-content ui-corner-all"></div>
+            or
+            <div class="form-row"><textarea name="body" id="body" cols="50" rows="4" /></textarea></div>
+            </fieldser>
+            <input type="submit" id="fsubmit" value="submit" class="nf-button ui-state-default ui-corner-all">
+            
+        </form>
+        <p>Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the comments page. If there is a url, the text will be ignored.</p>
+    </section>
+
+     <!-- begin script tags -->
+      <script src="/_utils/script/json2.js"></script>
+      <script src="<%= assets %>/js/jquery.js?1.3.2"></script>
+      <script src="<%= assets %>/js/jquery-ui-custom.js?1.7.1"></script>
+      <script src="<%= assets %>/js/jquery-ui-i18n.js?1.7.1"></script>
+      <script src="/_utils/script/jquery.cookies.js?0.9.0"></script>
+      <script src="/_utils/script/jquery.couch.js?0.9.0"></script>
+      <script src="<%= assets %>/vendor/couchapp/jquery.couchapp.js?0.3"></script>
+      <script src="<%= assets %>/vendor/couchapp/sha1.js"></script>
+      <script src="<%= assets %>/js/pure.js"></script>
+      <script src="<%= assets %>/js/nymphormation.js"></script>
+      <!-- end script tzgd -->
+      
+      <script>
+        $(document).ready(function() {
+          $.CouchApp(function(app) {
+            var app = app;
+            var tips = $("#validateTips");
+            
+            function updateTips(t) {
+                tips.text(t).effect("highlight", {},
+                1500);
+            }
+
+            function checkLength(v, n, min, max) {
+
+                if (v.length > max || v.length < min) {
+                    o.addClass('ui-state-error');
+                    updateTips("Length of " + n + " must be between " + min + " and " + max + ".");
+                    return false;
+                } else {
+                    return true;
+                }
+
+            }
+
+            var entryForm = app.docForm("form#fedit", {
+              fields: ["title", "url", "body"],
+              template: {
+                  type: "entry",
+                  author: "<%= username %>"
+              },
+              validForm: function(doc) {
+                  if (!doc.title) {
+                    updateTips("Title required");
+                    return false;
+                  }
+
+                  checkLength(doc.title, "title", 3, 50);
+                  
+                  if (!doc.body && !doc.url) {
+                    updateTips("Text or Url are empty.");
+                    return false;
+                  }
+                    
+                  return true;
+              },
+              success: function(resp, doc) {
+                document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+              }
+            });
+          });
+        })
+      </script>
+    
+  </body>
+ 
+</html>

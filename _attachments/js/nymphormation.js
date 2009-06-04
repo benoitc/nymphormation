@@ -24,6 +24,48 @@ function escapeHTML(st) {
   );                                                                     
 };
 
+
+function f(n) {    // Format integers to have at least two digits.
+    return n < 10 ? '0' + n : n;
+}
+Date.prototype.rfc3339 = function() {
+    return this.getUTCFullYear()   + '-' +
+         f(this.getUTCMonth() + 1) + '-' +
+         f(this.getUTCDate())      + 'T' +
+         f(this.getUTCHours())     + ':' +
+         f(this.getUTCMinutes())   + ':' +
+         f(this.getUTCSeconds())   + 'Z';
+};
+
+Date.prototype.setRFC3339 = function(dString){
+    var regexp = /(\d\d\d\d)(-)?(\d\d)(-)?(\d\d)(T)?(\d\d)(:)?(\d\d)(:)?(\d\d)(\.\d+)?(Z|([+-])(\d\d)(:)?(\d\d))/;
+
+    if (dString.toString().match(new RegExp(regexp))) {
+        var d = dString.match(new RegExp(regexp));
+        var offset = 0;
+
+        this.setUTCDate(1);
+        this.setUTCFullYear(parseInt(d[1],10));
+        this.setUTCMonth(parseInt(d[3],10) - 1);
+        this.setUTCDate(parseInt(d[5],10));
+        this.setUTCHours(parseInt(d[7],10));
+        this.setUTCMinutes(parseInt(d[9],10));
+        this.setUTCSeconds(parseInt(d[11],10));
+        if (d[12])
+            this.setUTCMilliseconds(parseFloat(d[12]) * 1000);
+        else
+            this.setUTCMilliseconds(0);
+        if (d[13] != 'Z') {
+            offset = (d[15] * 60) + parseInt(d[17],10);
+            offset *= ((d[14] == '-') ? -1 : 1);
+            this.setTime(this.getTime() - offset * 60 * 1000);
+        }
+    } else {
+        this.setTime(Date.parse(dString));
+    }
+    return this;
+};
+
 /*
 File: Math.uuid.js
 Version: 1.3
@@ -38,7 +80,6 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 
 Math.uuid = (function() {
   // Private array of chars to use
@@ -73,10 +114,103 @@ Math.uuid = (function() {
   };
 })();
 
+Math.uuidHex = function() {
+  return Math.uuid().replace(/-/g, '');
+}
+
+
+Math.uuidInt = function() {
+  return parseInt(Math.uuidHex(), 16);
+}
+
+function connectToChanges(app, fun) {
+  function resetHXR(x) {
+    x.abort();
+    connectToChanges(app, fun);    
+  };
+  app.db.info({success: function(db_info) {  
+    var c_xhr = jQuery.ajaxSettings.xhr();
+    c_xhr.open("GET", app.db.uri+"_changes?continuous=true&since="+db_info.update_seq, true);
+    c_xhr.send("");
+    c_xhr.onreadystatechange = fun;
+    setTimeout(function() {
+      resetHXR(c_xhr);      
+    }, 1000 * 60);
+  }});
+};
+
 
 
 (function($) {
   $.nymphormation = $.nymphormation || {};
+  
+  function User(app) {
+    var app = app;
+    var userdb = $.couch.db("user");
+
+    var self = this;
+    this.login = function(username, password, callback) {
+      var username = username,
+      password = hex_sha1(password),
+      callback = callback;
+      $.ajax({
+        type: "POST",
+        url: "/user/_login",
+        data: {
+          username: username,
+          password: password
+        },
+        beforeSend: function(req) {
+          req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
+        },
+        success: function(req) {
+          callback(req);
+        },
+        error: function(req, status, error) {
+          var resp = $.httpData(req, "json");
+          alert(resp.reason);
+        }
+      });
+    };
+
+    this.logout = function() {
+      $.ajax({
+        type: "POST",
+        url: "/user/_logout",
+        data: "",
+        beforeSend: function(req) {
+          req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
+        },
+        success: function(req) {
+          document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+        }
+      });
+    };
+
+    this.save = function(userDoc, callback) {
+      userdb.saveDoc(userDoc);
+      if (typeof calback != "undefined")
+        callback(userDoc);
+    }
+
+    this.register = function(name, username, password, email, callback) {
+      var salt = Math.uuidHex();
+      var password_hash = b64_sha1(salt + hex_sha1(password));
+
+      var user = {
+        fullname: escapeHTML(fullname.val()),
+        username: username,
+        email: email,
+        password: password_hash,
+        salt: salt,
+        type: "user"
+      };
+
+      userdb.saveDoc(user);
+      self.login(username, password, callback);
+    }
+  }
+  
   
  function userNav(app) {
    var app = app;
@@ -143,7 +277,7 @@ Math.uuid = (function() {
         
       });
       
-      $("#dialog").dialog({
+      $("#signupdlg").dialog({
         bgiframe: true,
         autoOpen: false,
         height: 300,
@@ -159,11 +293,10 @@ Math.uuid = (function() {
             bValid = bValid && checkLength(password, "password", 5, 16);
             
             bValid = bValid && checkRegexp(username, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter.");
-            // From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
-            bValid = bValid && checkEmail(email, "contact@nymphormation.com");
-		        bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
+            bValid = bValid && checkEmail(email, "Invalid email address. Should be formatted like contact@nymphormation.com");
+		    bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
 
-		        if (bValid) {
+		    if (bValid) {
               var salt = Math.uuid();
               var password_hash = b64_sha1(salt + hex_sha1(password.val()));
               
@@ -191,16 +324,13 @@ Math.uuid = (function() {
       });
       
       $("#signup").click(function() {
-          $('#dialog').dialog('open');
+          $('#signupdlg').dialog('open');
           return false;
       });
       
       $("#logout").click(function() {
         self.logout()
-      })
-      
-      
-      
+      });
       
       $("#flogin").submit(function(e) {
         e.preventDefault();
@@ -209,8 +339,7 @@ Math.uuid = (function() {
         
         self.login(lusername, lpassword);
         return false;
-      })
-      
+      });
     }
     
     this.logout = function() {
@@ -222,9 +351,7 @@ Math.uuid = (function() {
           req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
         },
         success: function(req) {
-          $.cookies.remove("NYMPHORMATION_ID", "/");
-          document.location = app.db.name + "/_design/" + app.dname + "/index.html";
-          
+          document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
         }
       });
     }
@@ -243,23 +370,19 @@ Math.uuid = (function() {
           req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
         },
         success: function(req) {
-          $.cookies.set("NYMPHORMATION_ID", username, "/");
           $("#not_logged_in").hide();
           $("#logged_in").show();
         },
-        
         error: function(req, status, error) {
           var resp = $.httpData(req, "json");
           alert(resp.reason);
         }
-        
       });
     }
-    
     this.init()
   }
   
-  $(".nf-button:not(.ui-state-disabled)")
+  /*$(".nf-button:not(.ui-state-disabled)")
   		.hover(
   			function(){ 
   				$(this).addClass("ui-state-hover"); 
@@ -268,16 +391,13 @@ Math.uuid = (function() {
   				$(this).removeClass("ui-state-hover"); 
   			}
   		)
-  		.mousedown(function(){
-  				$(this).parents('.fg-buttonset-single:first').find(".fg-button.ui-state-active").removeClass("ui-state-active");
-  				if( $(this).is('.ui-state-active.fg-button-toggleable, .fg-buttonset-multi .ui-state-active') ){ $(this).removeClass("ui-state-active"); }
-  				else { $(this).addClass("ui-state-active"); }	
-  		})
-  		.mouseup(function(){
-  			if(! $(this).is('.nf-button-toggleable, .nf-buttonset-single .fg-button,  .nf-buttonset-multi .nf-button') ){
-  				$(this).removeClass("ui-state-active");
-  			}
-  		});
+  		.mousedown(function() {
+  				if ($(this).is('.ui-state-active')) { 
+  				  $(this).removeClass("ui-state-active"); 
+  				} else { 
+  				  $(this).addClass("ui-state-active"); 
+  				}	
+  		});*/
   
   $.extend($.nymphormation, {
      userNav: userNav
