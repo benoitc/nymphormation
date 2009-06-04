@@ -19,9 +19,9 @@
       </script>
       <![endif]-->
     
-    <link rel="stylesheet" href="css/nymphormation.css" type="text/css">
-    <link rel="stylesheet" href="css/humanity/jquery-ui-custom.css?1.7.1" type="text/css">
     
+    <link rel="stylesheet" href="css/humanity/jquery-ui-custom.css?1.7.1" type="text/css">
+    <link rel="stylesheet" href="css/nymphormation.css" type="text/css">
   </head>
   <body>
     <div id="loginpane">
@@ -47,8 +47,8 @@
 
       </div>
     </div>
-    <div id="test">
-    </div>
+    <section id="news">
+    </section>
     <div id="addEntry" title="" style="display: none;">
         <h2>Submit</h2>
         <form name="fentry" id="fentry" method="POST" action=".">
@@ -99,6 +99,7 @@
         $(document).ready(function() {
           $.CouchApp(function(app) {
             new $.nymphormation.userNav(app);
+             newestPage(app);
           });
         })
       </script>

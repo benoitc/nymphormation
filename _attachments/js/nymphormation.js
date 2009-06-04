@@ -14,113 +14,33 @@
 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-
-function escapeHTML(st) {                                       
-  return(                                                                 
-    st && st.replace(/&/g,'&amp;').                                         
-      replace(/>/g,'&gt;').                                           
-      replace(/</g,'&lt;').                                           
-      replace(/"/g,'&quot;')                                         
-  );                                                                     
-};
-
-
-function f(n) {    // Format integers to have at least two digits.
-    return n < 10 ? '0' + n : n;
-}
-Date.prototype.rfc3339 = function() {
-    return this.getUTCFullYear()   + '-' +
-         f(this.getUTCMonth() + 1) + '-' +
-         f(this.getUTCDate())      + 'T' +
-         f(this.getUTCHours())     + ':' +
-         f(this.getUTCMinutes())   + ':' +
-         f(this.getUTCSeconds())   + 'Z';
-};
-
-Date.prototype.setRFC3339 = function(dString){
-    var regexp = /(\d\d\d\d)(-)?(\d\d)(-)?(\d\d)(T)?(\d\d)(:)?(\d\d)(:)?(\d\d)(\.\d+)?(Z|([+-])(\d\d)(:)?(\d\d))/;
-
-    if (dString.toString().match(new RegExp(regexp))) {
-        var d = dString.match(new RegExp(regexp));
-        var offset = 0;
-
-        this.setUTCDate(1);
-        this.setUTCFullYear(parseInt(d[1],10));
-        this.setUTCMonth(parseInt(d[3],10) - 1);
-        this.setUTCDate(parseInt(d[5],10));
-        this.setUTCHours(parseInt(d[7],10));
-        this.setUTCMinutes(parseInt(d[9],10));
-        this.setUTCSeconds(parseInt(d[11],10));
-        if (d[12])
-            this.setUTCMilliseconds(parseFloat(d[12]) * 1000);
-        else
-            this.setUTCMilliseconds(0);
-        if (d[13] != 'Z') {
-            offset = (d[15] * 60) + parseInt(d[17],10);
-            offset *= ((d[14] == '-') ? -1 : 1);
-            this.setTime(this.getTime() - offset * 60 * 1000);
-        }
-    } else {
-        this.setTime(Date.parse(dString));
+function updateChanges(app) {
+  app.view("news",{
+    reduce: false,
+    startkey: ["entry", {}],
+    endkey: ["entry"],
+    descending: true,
+    limit: 25,
+    success: function(json) {
+      $("#news").html(json.rows.map(function(row) {
+        var news = row.value;
+        return '<article class="link">'
+        + '<h1><a href="'+ news.url + '">' + news.title + '</a></h1>'
+        + '<p><span class="author">'+ news.author + '</span>'
+        + '<span class="comments"><a href="' + app.showPath("news", news._id) +'">'
+        + 'X comments</a></span</p></article>';
+      }).join(''));
     }
-    return this;
-};
-
-/*
-File: Math.uuid.js
-Version: 1.3
-Copyright (c) 2008, Robert Kieffer
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    * Neither the name of Robert Kieffer nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-Math.uuid = (function() {
-  // Private array of chars to use
-  var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split(''); 
-
-  return function (len, radix) {
-    var chars = CHARS, uuid = [], rnd = Math.random;
-    radix = radix || chars.length;
-
-    if (len) {
-      // Compact form
-      for (var i = 0; i < len; i++) uuid[i] = chars[0 | rnd()*radix];
-    } else {
-      // rfc4122, version 4 form
-      var r;
-
-      // rfc4122 requires these characters
-      uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-      uuid[14] = '4';
-
-      // Fill in random data.  At i==19 set the high bits of clock sequence as
-      // per rfc4122, sec. 4.1.5
-      for (var i = 0; i < 36; i++) {
-        if (!uuid[i]) {
-          r = 0 | rnd()*16;
-          uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r & 0xf];
-        }
-      }
-    }
-
-    return uuid.join('');
-  };
-})();
-
-Math.uuidHex = function() {
-  return Math.uuid().replace(/-/g, '');
+  });
+  
 }
 
-
-Math.uuidInt = function() {
-  return parseInt(Math.uuidHex(), 16);
+function newestPage(app) {
+  
+  updateChanges(app);
+  connectToChanges(app, function() {
+    updateChanges(app);
+  });
 }
 
 function connectToChanges(app, fun) {
@@ -139,6 +59,47 @@ function connectToChanges(app, fun) {
   }});
 };
 
+// Localize the display of <time> elements
+function localizeDates() {
+    var lastdate = '';
+    var now = new Date();
+
+    $('time').each(function() {
+       var el = this;
+
+        if (el.getAttribute('title') == "GMT") {
+            var date = new Date(Date.parseRFC3339(el.getAttribute('datetime')));
+            if (!date.getTime())
+                return;
+            diff = ((now.getTime() - date.getTime()) / 1000),
+            day_diff = Math.floor(diff / 86400);
+            if ( isNaN(day_diff) || day_diff < 0 || day_diff >= 31 )
+                return;
+            var text = date.toLocaleString();
+            var title = date.toLocaleString();
+            
+            if (day_diff == 0) {
+                text = (diff < 60 && "Just Now" ||
+                diff < 120 && "1 minute ago" ||
+                diff < 3600 && Math.floor( diff / 60 ) + " minutes ago" ||
+                diff < 7200 && "1 hour ago" ||
+                diff < 86400 && Math.floor( diff / 3600 ) + " hours ago");
+                title = date.toLocaleTimeString();
+            } else {
+                hours = date.getHours();
+                minutes = date.getMinutes();
+                hours = (hours < 10) && "0" + hours || hours;
+                minutes = (minutes < 10) && "0" + minutes || minutes;
+                text = (day_diff == 1 && "Yesterday at " +  hours + ":" + minutes ||
+                el.textContent);
+                title = date.toLocaleString();
+            }
+            el.setAttribute('title', title);
+            el.textContent = "posted " + text;
+        }
+    });
+
+}
 
 
 (function($) {

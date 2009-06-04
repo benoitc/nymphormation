@@ -19,9 +19,9 @@
       </script>
       <![endif]-->
     
-    <link rel="stylesheet" href="css/nymphormation.css" type="text/css">
-    <link rel="stylesheet" href="css/humanity/jquery-ui-custom.css?1.7.1" type="text/css">
     
+    <link rel="stylesheet" href="<%= assets %>/css/humanity/jquery-ui-custom.css?1.7.1" type="text/css">
+    <link rel="stylesheet" href="<%= assets %>/css/nymphormation.css" type="text/css">
   </head>
   <body>
     <div id="loginpane">
@@ -49,8 +49,24 @@
 
       </div>
     </div>
-    <section id="content" title="" style="display: none;">
+    <section id="content">
+        <article id="entry">
+          <header>
+            <h2><a href="<%= doc.url %>"><%= doc.title %></a></h2>
+            <p class="metadata">by <a href="#" rel="author"><%= doc.author %></a> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time></p>
+            
+            <% if (doc.body) { %>
+            <p><%= doc.body %></p>
+            <% } %>
+            
+          <form name="fcomment" id="fcomment">
+            <textarea name="comment" id="comment" id="body" cols="50" rows="4"></textarea>
+            <p><input type="submit" id="fsubmit" value="submit" class="nf-button ui-state-default ui-corner-all"></p>
+          </form>
+        </article>
         
+    </section>
+    <section id="comments">
     </section>
     <div id="signupdlg" title="Create new user">
     	
@@ -71,21 +87,22 @@
     
      <!-- begin script tags -->
       <script src="/_utils/script/json2.js"></script>
-      <script src="<%= assets %>js/jquery.js?1.3.2"></script>
-      <script src="<%= assets %>js/jquery-ui-custom.js?1.7.1"></script>
-      <script src="<%= assets %>js/jquery-ui-i18n.js?1.7.1"></script>
+      <script src="<%= assets %>/js/jquery.js?1.3.2"></script>
+      <script src="<%= assets %>/js/jquery-ui-custom.js?1.7.1"></script>
+      <script src="<%= assets %>/js/jquery-ui-i18n.js?1.7.1"></script>
       <script src="/_utils/script/jquery.cookies.js?0.9.0"></script>
       <script src="/_utils/script/jquery.couch.js?0.9.0"></script>
-      <script src="<%= assets %>vendor/couchapp/jquery.couchapp.js?0.3"></script>
-      <script src="<%= assets %>vendor/couchapp/sha1.js"></script>
-      <script src="<%= assets %>js/pure.js"></script>
-      <script src="<%= assets %>js/nymphormation.js"></script>
+      <script src="<%= assets %>/vendor/couchapp/jquery.couchapp.js?0.3"></script>
+      <script src="<%= assets %>/vendor/couchapp/sha1.js"></script>
+      <script src="<%= assets %>/js/pure.js"></script>
+      <script src="<%= assets %>/js/nymphormation.js"></script>
       <!-- end script tzgd -->
       
       <script>
         $(document).ready(function() {
           $.CouchApp(function(app) {
             new $.nymphormation.userNav(app);
+            localizeDates()
           });
         })
       </script>

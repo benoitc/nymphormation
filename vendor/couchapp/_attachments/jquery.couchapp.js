@@ -18,28 +18,134 @@
 //    ...
 // });
 
-(function($) {
+function escapeHTML(st) {                                       
+  return(                                                                 
+    st && st.replace(/&/g,'&amp;').                                         
+      replace(/>/g,'&gt;').                                           
+      replace(/</g,'&lt;').                                           
+      replace(/"/g,'&quot;')                                         
+  );                                                                     
+};
 
-  function f(n) {    // Format integers to have at least two digits.
-      return n < 10 ? '0' + n : n;
-  }
 
-  Date.prototype.toJSON = function() {
-      return this.getUTCFullYear()   + '/' +
-           f(this.getUTCMonth() + 1) + '/' +
-           f(this.getUTCDate())      + ' ' +
-           f(this.getUTCHours())     + ':' +
-           f(this.getUTCMinutes())   + ':' +
-           f(this.getUTCSeconds())   + ' +0000';
+function f(n) {    // Format integers to have at least two digits.
+    return n < 10 ? '0' + n : n;
+}
+
+Date.parseRFC3339 = function (string) {
+    var date=new Date(0);
+    var match = string.match(/(\d{4})-(\d\d)-(\d\d)\s*(?:[\sT]\s*(\d\d):(\d\d)(?::(\d\d))?(\.\d*)?\s*(Z|([-+])(\d\d):(\d\d))?)?/);
+    if (!match) return;
+    if (match[2]) match[2]--;
+    if (match[7]) match[7] = (match[7]+'000').substring(1,4);
+    var field = [null,'FullYear','Month','Date','Hours','Minutes','Seconds','Milliseconds'];
+    for (var i=1; i<=7; i++) if (match[i]) date['setUTC'+field[i]](match[i]);
+    if (match[9]) date.setTime(date.getTime()+(match[9]=='-'?1:-1)*(match[10]*3600000+match[11]*60000) );
+    return date.getTime();
+}
+
+Date.prototype.rfc3339 = function() {
+    return this.getUTCFullYear()   + '-' +
+         f(this.getUTCMonth() + 1) + '-' +
+         f(this.getUTCDate())      + 'T' +
+         f(this.getUTCHours())     + ':' +
+         f(this.getUTCMinutes())   + ':' +
+         f(this.getUTCSeconds())   + 'Z';
+};
+
+Date.prototype.setRFC3339 = function(dString){
+    var regexp = /(\d\d\d\d)(-)?(\d\d)(-)?(\d\d)(T)?(\d\d)(:)?(\d\d)(:)?(\d\d)(\.\d+)?(Z|([+-])(\d\d)(:)?(\d\d))/;
+
+    if (dString.toString().match(new RegExp(regexp))) {
+        var d = dString.match(new RegExp(regexp));
+        var offset = 0;
+
+        this.setUTCDate(1);
+        this.setUTCFullYear(parseInt(d[1],10));
+        this.setUTCMonth(parseInt(d[3],10) - 1);
+        this.setUTCDate(parseInt(d[5],10));
+        this.setUTCHours(parseInt(d[7],10));
+        this.setUTCMinutes(parseInt(d[9],10));
+        this.setUTCSeconds(parseInt(d[11],10));
+        if (d[12])
+            this.setUTCMilliseconds(parseFloat(d[12]) * 1000);
+        else
+            this.setUTCMilliseconds(0);
+        if (d[13] != 'Z') {
+            offset = (d[15] * 60) + parseInt(d[17],10);
+            offset *= ((d[14] == '-') ? -1 : 1);
+            this.setTime(this.getTime() - offset * 60 * 1000);
+        }
+    } else {
+        this.setTime(Date.parse(dString));
+    }
+    return this;
+};
+
+/*
+File: Math.uuid.js
+Version: 1.3
+Copyright (c) 2008, Robert Kieffer
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    * Neither the name of Robert Kieffer nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+Math.uuid =  function (len, radix) {
+  // Private array of chars to use
+  var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split(''); 
+
+  
+    var chars = CHARS, uuid = [], rnd = Math.random;
+    radix = radix || chars.length;
+
+    if (len) {
+      // Compact form
+      for (var i = 0; i < len; i++) uuid[i] = chars[0 | rnd()*radix];
+    } else {
+      // rfc4122, version 4 form
+      var r;
+
+      // rfc4122 requires these characters
+      uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+      uuid[14] = '4';
+
+      // Fill in random data.  At i==19 set the high bits of clock sequence as
+      // per rfc4122, sec. 4.1.5
+      for (var i = 0; i < 36; i++) {
+        if (!uuid[i]) {
+          r = 0 | rnd()*16;
+          uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r & 0xf];
+        }
+      }
+    }
+
+    return uuid.join('');
   };
   
+Math.uuidHex = function() {
+  return Math.uuid().replace(/-/g, '');
+};
+
+
+Math.uuidInt = function() {
+  return parseInt(Math.uuidHex(), 16);
+};
+
+(function($) {
+
   function Design(db, name) {
     this.view = function(view, opts) {
       db.view(name+'/'+view, opts);
     };
   };
 
-  var login;
   
   function init(app) {
     $(function() {
@@ -76,7 +182,6 @@
         // Apply the behavior
         $(formSelector).submit(function(e) {
           e.preventDefault();
-          localFormDoc = {};
           // formToDeepJSON acts on localFormDoc by reference
           formToDeepJSON(this, opts.fields, localFormDoc);
           if (opts.validForm && !opts.validForm(localFormDoc)) return false;

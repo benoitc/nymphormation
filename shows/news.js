@@ -2,6 +2,7 @@ function(doc, req) {
   // !code helpers/ejs/ejs.js
   // !code helpers/template.js
   // !code vendor/couchapp/path.js
+  // !code vendor/couchapp/date.js
   
   // !json templates.edit
   // !json templates.show
@@ -16,13 +17,18 @@ function(doc, req) {
     }
   } 
    
-  if (!doc)
+  var fcreated_at = null;
+  
+  if (!doc) {
     tpl = templates.edit;
-  else
+  } else {
     tpl = templates.show;
+    var fcreated_at = new Date().setRFC3339(doc.created_at).toLocaleString();
+  }
   
   return template(tpl, {
       doc: doc,
+      fcreated_at: fcreated_at,
       username: req.userCtx['name'],
       assets : assetPath()
   })
