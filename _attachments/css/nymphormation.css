@@ -1,11 +1,19 @@
 body {
     background-color: #EEEEEE;
     color: #666666;
-    font-family: Georgia,"Times New Roman",Times,serif;
+    font-family: Verdana,Arial,'Bitstream Vera Sans',Helvetica,sans-serif;
     font-size: 62.5%;
     margin: 0 0 100px;
     padding: 25px 25px 50px;
 }
+* html { height: 100%; }
+ul, ol, li, h1, h2, h3, h4, h5, p { margin: 0 0 0.3em 0; padding: 0; }
+strong { font-weight: bold;}
+a:link { text-decoration: none; color: #2e8696; }
+a:visited { text-decoration: none; color: #2e8696; }
+a:hover { text-decoration: underline; }
+a:active { text-decoration: underline; }
+
 a {
     color: #666666;
     text-decoration: underline;
@@ -37,3 +45,15 @@ a:hover {
 
 #signupdlg .ui-button { outline: 0; margin:0; padding: .4em 1em .5em; text-decoration:none;  !important; cursor:pointer; position: relative; text-align: center; }
 #signupdlg .ui-dialog .ui-state-highlight, .ui-dialog .ui-state-error { padding: .3em;  }
+
+
+ol#comments { list-style-type: decimal; }
+
+li.comment { margin-bottom: 7px; clear: both;}
+.subcomment, #newcomment { width: 450px; margin-bottom: 5px;}
+.subcomment textarea, #newcomment textarea { width: 450px; height: 70px; }
+.show-help { float: right; clear: right; }
+.subcomment input { float: left; }
+table.help { clear: both; width: 100%; }
+.subcomment form, #newcomment form { margin: 0;}
+form ol, form ol li { text-indent: 0; margin: 0; padding: 0;}

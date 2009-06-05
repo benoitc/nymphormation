@@ -24,7 +24,7 @@ function updateChanges(app) {
     success: function(json) {
       $("#news").html(json.rows.map(function(row) {
         var news = row.value;
-        return '<article class="link">'
+        return '<article class="item">'
         + '<h1><a href="'+ news.url + '">' + news.title + '</a></h1>'
         + '<p><span class="author">'+ news.author + '</span>'
         + '<span class="comments"><a href="' + app.showPath("news", news._id) +'">'
@@ -41,6 +41,131 @@ function newestPage(app) {
   connectToChanges(app, function() {
     updateChanges(app);
   });
+}
+
+function updateComments(app, docid) {
+  var docid = docid;
+  var app = app;
+  app.view("comments",{
+    key: docid,
+    descending: true,
+    success: function(json) {
+      $("#comments").html(json.rows.map(function(row) {
+        var comment = row.value;
+        var fcreated_at = new Date().setRFC3339(comment.created_at).toLocaleString();
+        return '<li class="comment" id="'+comment._id + '">'
+        + '<p>by <a href="#">'+ comment.author + '</a> '
+        + '<time title="GMT" datetime="' + comment.created_at + '" class="caps">'
+        + fcreated_at + '</time></p>'
+        + '<div class="text">' + comment.comment + '</div>'
+        + '<p><a id="'+comment._id + '_'+ docid + '" href="#" class="reply">'
+        + 'reply</a></p></li>';
+      }).join(''));
+      $(".reply").click(fsubcomment);
+    }
+  });
+  
+  
+}
+
+$.fn.noticeBox = function() {
+    return this.each(function() {
+        var s = this.style;
+        s.left = (($(window).width() - $(this).width()) / 2) + "px";
+        s.top = "40px";
+        });
+}
+
+markdown_help = function(obj) {
+    if ($(obj).next().is('.help')) {
+        $(obj).next().remove();
+        $(obj).html('help');
+    } else {
+        $(obj).html('hide help');
+        $(obj).parent().append('<table class="help">'+
+        '<tr><th>you type:</th><th>you see:</th></tr>'+
+        '<tr><td>*italics*</td><td><em>italics</em></td></tr>'+
+        '<tr><td>**bold**</td><td><b>bold</b></td></tr>'+
+        '<tr><td>[friendurl!](http://friendurl.com)</td><td><a href="http://friendurl.com">friendurl!</a></td></tr>'+
+        '<tr><td>* item 1<br/>* item 2<br />* item 3<br />'+
+        '<td><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul></td></tr>'+
+        '<tr><td> > quoted text</td><td><bloquote>quoted text</bloquote></td></tr>'+
+        '</table>');
+    }
+}
+
+function fsubcomment() {
+  if ($(this).next().is('.subcomment'))
+      return false;
+  var self = this;
+  var link_id = $(this).attr('id');
+  var ids= link_id.split("_");
+  cform = $('<form id=""></form');
+  $(cform).append('<input type="hidden" name="itemid" value="'+ ids[1] +'">'
+  + '<input type="hidden" name="parentid" value="'+ ids[0] + '">'
+  + '<textarea name="comment" class="scomment"></textarea>');
+  rsubmit=$('<div class="submit-row"></div>')
+  bsubmit = $('<input type="submit" name="bsubmit" value="comment">');
+  bcancel = $('<input type="reset" name="bcancel" value="cancel">');
+  bcancel.click(function() {
+      $(self).next().remove();
+  });
+  
+  $.CouchApp(function(app) {
+    var commentForm = app.docForm(cform, {
+      fields: ["comment", "itemid", "parentid"],
+      template: {
+          type: "comment",
+          author: "<%= username %>"
+      },
+      validForm: function(doc) {
+          if (!doc.comment) {
+            updateTips("Comment required");
+            return false;
+          }
+          
+          return true;
+      },
+      beforeSave: function(doc) {
+        doc.created_at = new Date().rfc3339();
+        if (!doc.parentid)
+          doc.parentid = null;
+      },
+      success: function(resp) {
+        notice = $('<div class="notice" type="z-index:1002; position:fixed;">comment added</div>');
+        notice.appendTo(document.body).noticeBox().fadeIn(400);
+        $(self).next().remove();
+      }
+    });
+  });
+  
+  /*bsubmit.click(function() {
+      $tcomment = $(this).parent().parent().children('.scomment');
+      comment = $tcomment.val()
+      
+      
+      return false;
+  });*/
+  
+  
+  
+  help = $('<a href="#" class="show-help">help</a>');
+  help.click(function() {       
+      markdown_help(this);
+      return false;
+  });
+
+  $(rsubmit).append(bsubmit);
+  $(rsubmit).append(bcancel);
+  $(rsubmit).append(help);
+  $(cform).append(rsubmit);
+
+  cdiv = $('<div class="subcomment">'+
+  '</div>');
+  $(cdiv).append(cform);
+
+  $(this).parent().append(cdiv);
+  return false;
 }
 
 function connectToChanges(app, fun) {

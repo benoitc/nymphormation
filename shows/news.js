@@ -15,7 +15,7 @@ function(doc, req) {
         "Location": "../index.html"
       }
     }
-  } 
+  }
    
   var fcreated_at = null;
   
