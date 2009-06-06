@@ -43,7 +43,7 @@ function updateChanges(app) {
             return '<article class="item">'
             + '<h1><a href="'+ news.url + '">' + news.title + '</a></h1>'
             + '<p><span class="author">'+ news.author + '</span>'
-            + '<span class="comments"><a href="' + app.showPath("news", news._id) +'">'
+            + '<span class="comments"><a href="' + app.showPath("item", news._id) +'">'
             + ' ' + nb + ' comments</a></span</p></article>';
           }).join(''));
         }
@@ -117,7 +117,7 @@ function updateComments(app, linkid, docid) {
       + fcreated_at + '</time></p>'
       + '<div class="text">' + c.body + '</div>';
       
-      ret += '<p><a href="'+ app.showPath("news", c._id) + '">link</a>'
+      ret += '<p><a href="'+ app.showPath("item", c._id) + '">link</a>'
       if (level < 5 )
         ret += ' | <a id="'+c._id + '_'+ linkid + '" href="#" class="reply">reply</a>';
       ret += '</p>'
@@ -129,7 +129,7 @@ function updateComments(app, linkid, docid) {
     return ret
   }
   
-  app.view("subtree",{
+  app.view("comments_subtree",{
     startkey: [docid],
     endkey: [docid, {}],
     success: function(json) {
@@ -277,7 +277,7 @@ function connectToChanges(app, fun) {
   app.db.info({success: function(db_info) {  
     var c_xhr = jQuery.ajaxSettings.xhr();
     c_xhr.open("GET", app.db.uri+"_changes?continuous=true&since="+db_info.update_seq, true);
-    c_xhr.send("");
+    c_xhr.send(null);
     c_xhr.onreadystatechange = fun;
     setTimeout(function() {
       resetHXR(c_xhr);      

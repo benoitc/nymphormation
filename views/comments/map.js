@@ -1,5 +1,5 @@
 function(doc) {
   if (doc.type == "comment") {
-    emit(doc.itemid, doc);
+    emit(doc.linkid, doc);
   }  
 }
