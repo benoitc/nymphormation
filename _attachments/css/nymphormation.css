@@ -23,8 +23,27 @@ a:hover {
     text-decoration: underline;
 }
 
+.loginform {
+    float: left;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 45%;
+}
+
+.divide {
+    border-right: 2px solid #d3d3d3;
+}
+
+.loginform label {
+    display: block;
+    font-weight: bold;
+}
 
 
+.loginform p {
+    font-size: 80%;
+    margin-bottom: 0.8em;
+}
 #signupdlg label, #signupdlg input {
     display: block;
 }

@@ -14,6 +14,25 @@
 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+function parseUri(sourceUri){
+   /* parseUri by Steven Levithan (http://badassery.blogspot.com) */
+    var uriPartNames = ["source","protocol","authority","domain","port","path","directoryPath","fileName","query","anchor"];
+    var uriParts = new RegExp("^(?:([^:/?#.]+):)?(?://)?(([^:/?#]*)(?::(\\d*))?)?((/(?:[^?#](?![^?#/]*\\.[^?#/.]+(?:[\\?#]|$)))*/?)?([^?#/]*))?(?:\\?([^#]*))?(?:#(.*))?").exec(sourceUri);
+    var uri = {};
+    
+    for(var i = 0; i < 10; i++){
+        uri[uriPartNames[i]] = (uriParts[i] ? uriParts[i] : "");
+    }
+    
+    // Always end directoryPath with a trailing backslash if a path was present in the source URI
+    // Note that a trailing backslash is NOT automatically inserted within or appended to the "path" key
+    if(uri.directoryPath.length > 0){
+        uri.directoryPath = uri.directoryPath.replace(/\/?$/, "/");
+    }
+    
+    return uri;
+}
+
 function updateChanges(app) {
   app.view("news",{
     reduce: false,
@@ -39,9 +58,10 @@ function updateChanges(app) {
           
           $("#news").html(data.rows.map(function(row) {
             var news = row.value;
+            url = parseUri(news.url)
             var nb = nb_comments[news._id] || 0;
             return '<article class="item">'
-            + '<h1><a href="'+ news.url + '">' + news.title + '</a></h1>'
+            + '<h1><a href="'+ news.url + '">' + news.title + '</a> <span clas="host">'+url.domain+'</span></h1>'
             + '<p><span class="author">'+ news.author + '</span>'
             + '<span class="comments"><a href="' + app.showPath("item", news._id) +'">'
             + ' ' + nb + ' comments</a></span</p></article>';
@@ -193,79 +213,89 @@ function formToDeepJSON(form, fields, doc) {
 function fsubcomment() {
   if ($(this).next().is('.subcomment'))
       return false;
-  var self = this;
-  var link_id = $(this).attr('id');
-  var ids= link_id.split("_");
-  cform = $('<form id=""></form');
-  $(cform).append('<input type="hidden" name="linkid" value="'+ ids[1] +'">'
-  + '<input type="hidden" name="parentid" value="'+ ids[0] + '">'
-  + '<textarea name="body" class="scomment"></textarea>');
-  rsubmit=$('<div class="submit-row"></div>')
-  bsubmit = $('<input type="submit" name="bsubmit" value="comment">');
-  bcancel = $('<input type="reset" name="bcancel" value="cancel">');
-  bcancel.click(function() {
-      $(self).next().remove();
-  });
-  
-  $.CouchApp(function(app) {
-    $(cform).submit(function(e) {
-      e.preventDefault();
-      var localFormDoc = {
-        type: "comment",
-        author: username
-      };
-    
-      formToDeepJSON(this, ["body", "linkid", "parentid"], localFormDoc);
-      if (!localFormDoc.body) {
-        alert("Comment required");
-        return false;
-      }
       
-      localFormDoc.created_at = new Date().rfc3339();
-      if (!localFormDoc.parentid) {
-        localFormDoc.parentid = null;
-      }
-      app.db.openDoc(localFormDoc.parentid,{
-        success: function(json) {
-          if (json.path == undefined)
-            path = [];
-          else
-            path = json.path;
-          path.push(localFormDoc.parentid);
-          localFormDoc.path = path;
-          app.db.saveDoc(localFormDoc, {
-            success: function(resp) {
-              notice = $('<div class="notice" type="z-index:1002; position:fixed;">comment added</div>');
-              notice.appendTo(document.body).noticeBox().fadeIn(400);
-              $(self).next().remove();
-            }
-          })
+  var obj = this;
+  $.CouchApp(function(app) {
+    app.isLogged(function() {
+      
+      var self = obj;
+      var link_id = $(self).attr('id');
+      var ids= link_id.split("_");
+      cform = $('<form id=""></form');
+      $(cform).append('<input type="hidden" name="linkid" value="'+ ids[1] +'">'
+      + '<input type="hidden" name="parentid" value="'+ ids[0] + '">'
+      + '<textarea name="body" class="scomment"></textarea>');
+      rsubmit=$('<div class="submit-row"></div>')
+      bsubmit = $('<input type="submit" name="bsubmit" value="comment">');
+      bcancel = $('<input type="reset" name="bcancel" value="cancel">');
+      bcancel.click(function() {
+          $(self).next().remove();
+      });
+  
+  
+        $(cform).submit(function(e) {
+          e.preventDefault();
+          var localFormDoc = {
+            type: "comment",
+            author: username
+          };
+    
+          formToDeepJSON(this, ["body", "linkid", "parentid"], localFormDoc);
+          if (!localFormDoc.body) {
+            alert("Comment required");
+            return false;
+          }
+      
+          localFormDoc.created_at = new Date().rfc3339();
+          if (!localFormDoc.parentid) {
+            localFormDoc.parentid = null;
+          }
+          app.db.openDoc(localFormDoc.parentid,{ 
+            success: function(json) {
+              if (json.path == undefined)
+                path = [];
+              else
+                path = json.path;
+              path.push(localFormDoc.parentid);
+              localFormDoc.path = path;
+              app.db.saveDoc(localFormDoc, {
+                success: function(resp) {
+                  notice = $('<div class="notice" type="z-index:1002; position:fixed;">comment added</div>');
+                  notice.appendTo(document.body).noticeBox().fadeIn(400);
+                  $(self).next().remove();
+                }
+              })
           
-        }
-      })
+            }
+          });
     
-      return false;
+          return false;
     
-    });
+        });
+  
+
+
+      help = $('<a href="#" class="show-help">help</a>');
+      help.click(function() {       
+          markdown_help(self);
+          return false;
+      });
+
+      $(rsubmit).append(bsubmit);
+      $(rsubmit).append(bcancel);
+      $(rsubmit).append(help);
+      $(cform).append(rsubmit);
+
+      cdiv = $('<div class="subcomment">'+
+      '</div>');
+      $(cdiv).append(cform);
+
+      $(self).parent().append(cdiv);
+  
+    }, function() {
+        $("#login-popup").dialog('open');
+    })
   });
-
-
-  help = $('<a href="#" class="show-help">help</a>');
-  help.click(function() {       
-      markdown_help(this);
-      return false;
-  });
-
-  $(rsubmit).append(bsubmit);
-  $(rsubmit).append(bcancel);
-  $(rsubmit).append(help);
-  $(cform).append(rsubmit);
-
-  cdiv = $('<div class="subcomment">'+
-  '</div>');
-  $(cdiv).append(cform);
-
-  $(this).parent().append(cdiv);
   return false;
 }
 
@@ -277,7 +307,7 @@ function connectToChanges(app, fun) {
   app.db.info({success: function(db_info) {  
     var c_xhr = jQuery.ajaxSettings.xhr();
     c_xhr.open("GET", app.db.uri+"_changes?continuous=true&since="+db_info.update_seq, true);
-    c_xhr.send(null);
+    c_xhr.send("");
     c_xhr.onreadystatechange = fun;
     setTimeout(function() {
       resetHXR(c_xhr);      
@@ -330,7 +360,7 @@ function localizeDates() {
 
 (function($) {
   $.nymphormation = $.nymphormation || {};
-  
+
   function User(app) {
     var app = app;
     var userdb = $.couch.db("user");
@@ -510,10 +540,7 @@ function localizeDates() {
 	      }
       });
       
-      $("#signup").click(function() {
-          $('#signupdlg').dialog('open');
-          return false;
-      });
+      
       
       $("#logout").click(function() {
         self.logout()
@@ -569,22 +596,57 @@ function localizeDates() {
     this.init()
   }
   
-  /*$(".nf-button:not(.ui-state-disabled)")
-  		.hover(
-  			function(){ 
-  				$(this).addClass("ui-state-hover"); 
-  			},
-  			function(){ 
-  				$(this).removeClass("ui-state-hover"); 
-  			}
-  		)
-  		.mousedown(function() {
-  				if ($(this).is('.ui-state-active')) { 
-  				  $(this).removeClass("ui-state-active"); 
-  				} else { 
-  				  $(this).addClass("ui-state-active"); 
-  				}	
-  		});*/
+  $("#login-popup").dialog({
+    bgiframe: true,
+    autoOpen: false,
+    height: 300,
+    width: 650,
+    modal: true,
+    resizable: false
+  });
+  
+  $("#signup").click(function() {
+      //$('#signupdlg').dialog('open');
+      $("#login-popup").dialog('open');
+      return false;
+  });
+  
+  $('.add').click(function(e) {
+    e.preventDefault();
+    $.CouchApp(function(app) {
+      app.isLogged(function() {
+        document.location = app.showPath("item");
+      }, function() {
+        $("#login-popup").dialog('open');
+      });
+    })
+    
+    
+    return false;
+  })
+  
+  
+  $(".nf-button")
+    .hover(
+  		function() {
+  			$(this).addClass('ui-state-hover');
+  		},
+  		function() {
+  			$(this).removeClass('ui-state-hover');
+  		}
+  	)
+  	.focus(function() {
+  		$(this).removeClass('ui-state-focus');
+  	})
+  	.blur(function() {
+  	  $(this).removeClass('ui-state-focus');
+  	})
+  	.mousedown(function(ev) {
+			ev.stopPropagation();
+		})
+		.mouseout(function(ev) {
+		  ev.stopPropagation();
+		})
   
   $.extend($.nymphormation, {
      userNav: userNav

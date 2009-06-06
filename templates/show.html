@@ -65,12 +65,18 @@
           <form name="fcomment" id="fcomment">
             <input type="hidden" name="linkid" id="linkid" value="<%= linkid %>">
             <input type="hidden" name="parentid" id="parentid" value="<%= doc._id %>">
-            <textarea name="body" id="body" id="body" cols="70" rows="5"></textarea>
+            <textarea name="body" id="body" cols="70" rows="5"></textarea>
             <p><input type="submit" id="fsubmit" value="submit" class="nf-button ui-state-default ui-corner-all"></p>
           </form>
         </article>
         <section id="comments"></section>
     </section>
+    
+    <aside id="sidebar">
+      <div id="add_entry">
+        <a href="" class="add">Add an entry</a>
+      </div>
+    </aside>
    
     <div id="signupdlg" title="Create new user">
     	
@@ -87,6 +93,34 @@
     		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
     	</fieldset>
     	</form>
+    </div>
+    
+    <div id="login-popup" title="you'll need to login or register to do that">
+      <div class="loginform divide">
+        <h3>create a new account</h3>
+        <p class="info">needed to post a link or a comment</p>
+        <form id="fsignup">
+          <ul>
+      		  <li><label for="fullname">Full name:</label><input type="text" name="fullname" id="fullname" class="text ui-widget-content ui-corner-all" /></li>
+      		  <li><label for="username">Username:</label><input type="text" name="username" id="username" class="text ui-widget-content ui-corner-all" /></li>
+      		  <li><label for="password">Password:</label><input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" /></li>
+      		  <li><label for="email">Email:</label><input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" /></li>
+      		  <li><input id="signupbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="create this account"></li>
+      	  </ul>
+      	</form>
+      </div>
+      
+      <div class="loginform">
+        <h3>login</h3>
+        <p class="info">already have an account and just want to login?</p>
+        <form id="flogin">
+            <ul>
+              <li><label for="login_username">Username: </label><input id="login_username" type="text" value="" class="text ui-widget-content ui-corner-all" /></li>
+              <li><label id="psw-label" for="login_password">Password: </label><input id="login_password" type="password" maxlength="20" value="" class="text ui-widget-content ui-corner-all" /></li>
+              <li><input id="loginbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="login"></li>
+            <ul> 
+        </form>
+      </div>
     </div>
     
      <!-- begin script tags -->
@@ -110,6 +144,7 @@
             var app = app;
             new $.nymphormation.userNav(app);
             localizeDates();
+            $("textarea").resizable();
             
             updateComments(app, "<%= linkid %>", "<%= doc._id %>");
             var tips = $("#validateTips");
