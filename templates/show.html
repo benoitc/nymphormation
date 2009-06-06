@@ -67,7 +67,7 @@
             <p><input type="submit" id="fsubmit" value="submit" class="nf-button ui-state-default ui-corner-all"></p>
           </form>
         </article>
-        <ol id="comments"></ol>
+        <section id="comments"></section>
     </section>
    
     <div id="signupdlg" title="Create new user">
@@ -101,7 +101,8 @@
       <!-- end script tzgd -->
       
       <script>
-        var itemid = "<%= doc._id %>"
+        var itemid = "<%= doc._id %>";
+        var username = "<%= username %>";
         $(document).ready(function() {
           $.CouchApp(function(app) {
             var app = app;
@@ -119,6 +120,7 @@
             var entryForm = app.docForm("form#fcomment", {
               fields: ["comment", "itemid", "parentid"],
               template: {
+                  path: [itemid],
                   type: "comment",
                   author: "<%= username %>"
               },

@@ -21,18 +21,35 @@ function updateChanges(app) {
     endkey: ["entry"],
     descending: true,
     limit: 25,
-    success: function(json) {
-      $("#news").html(json.rows.map(function(row) {
-        var news = row.value;
-        return '<article class="item">'
-        + '<h1><a href="'+ news.url + '">' + news.title + '</a></h1>'
-        + '<p><span class="author">'+ news.author + '</span>'
-        + '<span class="comments"><a href="' + app.showPath("news", news._id) +'">'
-        + 'X comments</a></span</p></article>';
-      }).join(''));
+    success: function(data) {
+      var ids = [];
+      for (var i=0; i<data.rows.length; i++) {
+        ids.push(data.rows[i].value['_id']);
+      }
+      
+      app.view("comments", {
+        keys: ids,
+        group: true,
+        success: function(json) {
+          var nb_comments = {};
+          for (var i=0; i<json.rows.length; i++) {
+            row = json.rows[i];
+            nb_comments[row.key] = row.value;
+          }
+          
+          $("#news").html(data.rows.map(function(row) {
+            var news = row.value;
+            var nb = nb_comments[news._id] || 0;
+            return '<article class="item">'
+            + '<h1><a href="'+ news.url + '">' + news.title + '</a></h1>'
+            + '<p><span class="author">'+ news.author + '</span>'
+            + '<span class="comments"><a href="' + app.showPath("news", news._id) +'">'
+            + ' ' + nb + ' comments</a></span</p></article>';
+          }).join(''));
+        }
+      });  
     }
   });
-  
 }
 
 function newestPage(app) {
@@ -46,22 +63,83 @@ function newestPage(app) {
 function updateComments(app, docid) {
   var docid = docid;
   var app = app;
-  app.view("comments",{
-    key: docid,
-    descending: true,
+  
+  
+  function children(rows, comments, idx_comments) {
+    for(var v=0; v < rows.length; v++) {
+      value = rows[v].value;
+      children = [];
+      if (idx_comments[value['_id']] != undefined)
+        children = idx_comments[value['_id']]['children'];
+      value['children'] = children
+      idx_comments[value._id] = value;
+
+      if (value['parentid']) {
+        if (idx_comments[value['parentid']] == undefined) 
+          idx_comments[value['parentid']] = {};
+        if (idx_comments[value['parentid']]['children']  == undefined)
+          idx_comments[value['parentid']]['children'] = [];
+        idx_comments[value['parentid']]['children'].push(value._id);
+      } else {
+        comments.push(value)
+      }
+    }
+  }
+  
+  
+  function iter_comments(comments, idx, start) {
+    if (start == undefined) {
+       start = 0;
+    }
+    var c = comments[start];
+    var thread = [];
+    if (c['children'].length > 0) {
+      for (var i=0; i < c.children.length; i++)
+        thread.push(idx[c.children[i]]);
+      iter_comments(thread, idx)
+    }
+    c['thread']  = thread;
+    comments[start] = c;
+    if (start < (comments.length - 1))
+      iter_comments(comments, idx, start+1);
+  }
+  
+  function dthread(thread, level) {
+    if (level == undefined)
+      level = 0;
+    ret = "<ul>";
+    for (var i=0; i<thread.length; i++) {
+      var c = thread[i];
+      var fcreated_at = new Date().setRFC3339(c.created_at).toLocaleString();
+      ret += '<li class="comment" id="'+c._id + '">'
+      + '<p class="meta">by <a href="#">'+ c.author + '</a> '
+      + '<time title="GMT" datetime="' + c.created_at + '" class="caps">'
+      + fcreated_at + '</time></p>'
+      + '<div class="text">' + c.comment + '</div>';
+      
+      if (level < 5 )
+        ret += '<p><a id="'+c._id + '_'+ docid + '" href="#" class="reply">reply</a></p>';
+      if (c['thread'])
+        ret += dthread(c['thread'], level+1);
+      ret +=  "</li>"
+    }
+    ret += "</ul>";
+    return ret
+  }
+  
+  app.view("subtree",{
+    startkey: [docid],
+    endkey: [docid, {}],
     success: function(json) {
-      $("#comments").html(json.rows.map(function(row) {
-        var comment = row.value;
-        var fcreated_at = new Date().setRFC3339(comment.created_at).toLocaleString();
-        return '<li class="comment" id="'+comment._id + '">'
-        + '<p>by <a href="#">'+ comment.author + '</a> '
-        + '<time title="GMT" datetime="' + comment.created_at + '" class="caps">'
-        + fcreated_at + '</time></p>'
-        + '<div class="text">' + comment.comment + '</div>'
-        + '<p><a id="'+comment._id + '_'+ docid + '" href="#" class="reply">'
-        + 'reply</a></p></li>';
-      }).join(''));
+      if (json.rows.length>0) {
+        var idx_comments = {};
+        var comments = [];
+        children(json.rows, comments, idx_comments);
+        iter_comments(comments, idx_comments);
+        $("#comments").html(dthread(comments));
+      }
       $(".reply").click(fsubcomment);
+      return true;
     }
   });
   
@@ -94,6 +172,22 @@ markdown_help = function(obj) {
     }
 }
 
+function formToDeepJSON(form, fields, doc) {
+  var form = $(form);
+  fields.forEach(function(field) {
+    var val = form.find("[name="+field+"]").val()
+    if (!val) return;
+    var parts = field.split('-');
+    var frontObj = doc, frontName = parts.shift();
+    while (parts.length > 0) {
+      frontObj[frontName] = frontObj[frontName] || {}
+      frontObj = frontObj[frontName];
+      frontName = parts.shift();
+    }
+    frontObj[frontName] = val;
+  });
+};
+
 function fsubcomment() {
   if ($(this).next().is('.subcomment'))
       return false;
@@ -112,11 +206,53 @@ function fsubcomment() {
   });
   
   $.CouchApp(function(app) {
+    $(cform).submit(function(e) {
+      e.preventDefault();
+      var localFormDoc = {
+        type: "comment",
+        author: username
+      };
+    
+      formToDeepJSON(this, ["comment", "itemid", "parentid"], localFormDoc);
+      if (!localFormDoc.comment) {
+        updateTips("Comment required");
+        return false;
+      }
+      
+      localFormDoc.created_at = new Date().rfc3339();
+      if (!localFormDoc.parentid) {
+        localFormDoc.parentid = null;
+      }
+      app.db.openDoc(localFormDoc.parentid,{
+        success: function(json) {
+          if (json.path == undefined)
+            path = [];
+          else
+            path = json.path;
+          path.push(localFormDoc.parentid);
+          localFormDoc.path = path;
+          app.db.saveDoc(localFormDoc, {
+            success: function(resp) {
+              notice = $('<div class="notice" type="z-index:1002; position:fixed;">comment added</div>');
+              notice.appendTo(document.body).noticeBox().fadeIn(400);
+              $(self).next().remove();
+            }
+          })
+          
+        }
+      })
+    
+      return false;
+    
+    });
+  });
+  
+  /*$.CouchApp(function(app) {
     var commentForm = app.docForm(cform, {
       fields: ["comment", "itemid", "parentid"],
       template: {
           type: "comment",
-          author: "<%= username %>"
+          author: username
       },
       validForm: function(doc) {
           if (!doc.comment) {
@@ -128,8 +264,9 @@ function fsubcomment() {
       },
       beforeSave: function(doc) {
         doc.created_at = new Date().rfc3339();
-        if (!doc.parentid)
+        if (!doc.parentid) {
           doc.parentid = null;
+        }
       },
       success: function(resp) {
         notice = $('<div class="notice" type="z-index:1002; position:fixed;">comment added</div>');
@@ -137,18 +274,9 @@ function fsubcomment() {
         $(self).next().remove();
       }
     });
-  });
-  
-  /*bsubmit.click(function() {
-      $tcomment = $(this).parent().parent().children('.scomment');
-      comment = $tcomment.val()
-      
-      
-      return false;
   });*/
   
-  
-  
+
   help = $('<a href="#" class="show-help">help</a>');
   help.click(function() {       
       markdown_help(this);

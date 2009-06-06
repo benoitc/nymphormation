@@ -24,6 +24,7 @@ a:hover {
 }
 
 
+
 #signupdlg label, #signupdlg input {
     display: block;
 }
@@ -46,10 +47,25 @@ a:hover {
 #signupdlg .ui-button { outline: 0; margin:0; padding: .4em 1em .5em; text-decoration:none;  !important; cursor:pointer; position: relative; text-align: center; }
 #signupdlg .ui-dialog .ui-state-highlight, .ui-dialog .ui-state-error { padding: .3em;  }
 
+section#comments {
+    display: block;
+    margin-top: 20px;
+}
 
-ol#comments { list-style-type: decimal; }
+ol, ul {
+list-style-image:none;
+list-style-position:outside;
+list-style-type:none;
+}
 
-li.comment { margin-bottom: 7px; clear: both;}
+li ul {
+  margin: 15px;  
+}
+li.comment { 
+    margin-bottom: 7px; 
+    clear: both;
+    
+}
 .subcomment, #newcomment { width: 450px; margin-bottom: 5px;}
 .subcomment textarea, #newcomment textarea { width: 450px; height: 70px; }
 .show-help { float: right; clear: right; }
