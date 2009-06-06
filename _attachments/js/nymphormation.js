@@ -17,8 +17,8 @@
 function updateChanges(app) {
   app.view("news",{
     reduce: false,
-    startkey: ["entry", {}],
-    endkey: ["entry"],
+    startkey: ["link", {}],
+    endkey: ["link"],
     descending: true,
     limit: 25,
     success: function(data) {
@@ -60,12 +60,12 @@ function newestPage(app) {
   });
 }
 
-function updateComments(app, docid) {
+function updateComments(app, linkid, docid) {
   var docid = docid;
+  var linkid = linkid;
   var app = app;
   
-  
-  function children(rows, comments, idx_comments) {
+  function children(parentid, rows, comments, idx_comments) {
     for(var v=0; v < rows.length; v++) {
       value = rows[v].value;
       children = [];
@@ -74,7 +74,7 @@ function updateComments(app, docid) {
       value['children'] = children
       idx_comments[value._id] = value;
 
-      if (value['parentid']) {
+      if (value['parentid'] && value['parentid'] != parentid) {
         if (idx_comments[value['parentid']] == undefined) 
           idx_comments[value['parentid']] = {};
         if (idx_comments[value['parentid']]['children']  == undefined)
@@ -115,10 +115,12 @@ function updateComments(app, docid) {
       + '<p class="meta">by <a href="#">'+ c.author + '</a> '
       + '<time title="GMT" datetime="' + c.created_at + '" class="caps">'
       + fcreated_at + '</time></p>'
-      + '<div class="text">' + c.comment + '</div>';
+      + '<div class="text">' + c.body + '</div>';
       
+      ret += '<p><a href="'+ app.showPath("news", c._id) + '">link</a>'
       if (level < 5 )
-        ret += '<p><a id="'+c._id + '_'+ docid + '" href="#" class="reply">reply</a></p>';
+        ret += ' | <a id="'+c._id + '_'+ linkid + '" href="#" class="reply">reply</a>';
+      ret += '</p>'
       if (c['thread'])
         ret += dthread(c['thread'], level+1);
       ret +=  "</li>"
@@ -134,7 +136,7 @@ function updateComments(app, docid) {
       if (json.rows.length>0) {
         var idx_comments = {};
         var comments = [];
-        children(json.rows, comments, idx_comments);
+        children(docid, json.rows, comments, idx_comments);
         iter_comments(comments, idx_comments);
         $("#comments").html(dthread(comments));
       }
@@ -195,9 +197,9 @@ function fsubcomment() {
   var link_id = $(this).attr('id');
   var ids= link_id.split("_");
   cform = $('<form id=""></form');
-  $(cform).append('<input type="hidden" name="itemid" value="'+ ids[1] +'">'
+  $(cform).append('<input type="hidden" name="linkid" value="'+ ids[1] +'">'
   + '<input type="hidden" name="parentid" value="'+ ids[0] + '">'
-  + '<textarea name="comment" class="scomment"></textarea>');
+  + '<textarea name="body" class="scomment"></textarea>');
   rsubmit=$('<div class="submit-row"></div>')
   bsubmit = $('<input type="submit" name="bsubmit" value="comment">');
   bcancel = $('<input type="reset" name="bcancel" value="cancel">');
@@ -213,9 +215,9 @@ function fsubcomment() {
         author: username
       };
     
-      formToDeepJSON(this, ["comment", "itemid", "parentid"], localFormDoc);
-      if (!localFormDoc.comment) {
-        updateTips("Comment required");
+      formToDeepJSON(this, ["body", "linkid", "parentid"], localFormDoc);
+      if (!localFormDoc.body) {
+        alert("Comment required");
         return false;
       }
       
@@ -246,36 +248,7 @@ function fsubcomment() {
     
     });
   });
-  
-  /*$.CouchApp(function(app) {
-    var commentForm = app.docForm(cform, {
-      fields: ["comment", "itemid", "parentid"],
-      template: {
-          type: "comment",
-          author: username
-      },
-      validForm: function(doc) {
-          if (!doc.comment) {
-            updateTips("Comment required");
-            return false;
-          }
-          
-          return true;
-      },
-      beforeSave: function(doc) {
-        doc.created_at = new Date().rfc3339();
-        if (!doc.parentid) {
-          doc.parentid = null;
-        }
-      },
-      success: function(resp) {
-        notice = $('<div class="notice" type="z-index:1002; position:fixed;">comment added</div>');
-        notice.appendTo(document.body).noticeBox().fadeIn(400);
-        $(self).next().remove();
-      }
-    });
-  });*/
-  
+
 
   help = $('<a href="#" class="show-help">help</a>');
   help.click(function() {       

@@ -16,18 +16,34 @@ function(doc, req) {
       }
     }
   }
-   
-  var fcreated_at = null;
   
+  var fcreated_at = null;
+  var parent_url = null;
+  var path = null;
+  var linkid = null;
   if (!doc) {
     tpl = templates.edit;
   } else {
     tpl = templates.show;
     var fcreated_at = new Date().setRFC3339(doc.created_at).toLocaleString();
+   
+    
+    if (doc.type == "link") {
+      linkid = doc._id;
+      path = [ linkid ];
+    } else {
+      linkid = doc.linkid;
+      path = doc.path;
+      path.push(doc._id); 
+      parent_url = showPath("news", doc.parentid);
+    }
   }
   
   return template(tpl, {
       doc: doc,
+      linkid: linkid,
+      parent_url: parent_url,
+      path: toJSON(path),
       fcreated_at: fcreated_at,
       username: req.userCtx['name'],
       assets : assetPath()
