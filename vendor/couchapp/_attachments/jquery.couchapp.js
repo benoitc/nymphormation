@@ -258,6 +258,53 @@ Math.uuidInt = function() {
       		Math.ceil( day_diff / 365 ) + " years ago";
       };
       
+      function login(options) {
+        options = options || {};
+        var username = options.username, 
+        password = hex_sha1(options.password);
+        
+        var userdb = options.userdb || dbname;
+        $.ajax({
+          type: "POST",
+          url: "/" + userdb + "/_login",
+          data: { username: username, password: password },
+          beforeSend: function(req) {
+            req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
+          },
+          complete: function(req) {
+            var resp = $.httpData(req, "json");
+            if (req.status == 200) {
+              if (options.success) options.success(resp);
+            } else if (options.error) {
+              options.error(req.status, resp.error, resp.reason);
+            } else {
+              alert("An error occurred logging in: " + resp.reason);
+            }
+          }
+        });
+      };
+      
+      function logout(options) {
+        options = options || {};
+        var userdb = options.userdb || dbname;
+        $.ajax({
+          type: "POST", url: "/" + userdb  + "/_logout", dataType: "json",
+          beforeSend: function(req) {
+            req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
+          },
+          complete: function(req) {
+            var resp = $.httpData(req, "json");
+            if (req.status == 200) {
+              if (options.success) options.success(resp);
+            } else if (options.error) {
+              options.error(req.status, resp.error, resp.reason);
+            } else {
+              alert("An error occurred logging out: " + resp.reason);
+            }
+          }
+        });
+      };
+      
       app({
         showPath : function(funcname, docid) {
           // I wish this was shared with path.js...
@@ -288,7 +335,9 @@ Math.uuidInt = function() {
         design : design,
         view : design.view,
         docForm : docForm,
-        prettyDate : prettyDate
+        prettyDate : prettyDate,
+        login: login,
+        logout: logout
       });
     });
   };

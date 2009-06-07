@@ -35,7 +35,7 @@ function(doc, req) {
       linkid = doc.linkid;
       path = doc.path;
       path.push(doc._id); 
-      parent_url = showPath("news", doc.parentid);
+      parent_url = showPath("item", doc.parentid);
     }
   }
   

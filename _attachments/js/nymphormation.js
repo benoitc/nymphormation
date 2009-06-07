@@ -366,43 +366,7 @@ function localizeDates() {
     var userdb = $.couch.db("user");
 
     var self = this;
-    this.login = function(username, password, callback) {
-      var username = username,
-      password = hex_sha1(password),
-      callback = callback;
-      $.ajax({
-        type: "POST",
-        url: "/user/_login",
-        data: {
-          username: username,
-          password: password
-        },
-        beforeSend: function(req) {
-          req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
-        },
-        success: function(req) {
-          callback(req);
-        },
-        error: function(req, status, error) {
-          var resp = $.httpData(req, "json");
-          alert(resp.reason);
-        }
-      });
-    };
 
-    this.logout = function() {
-      $.ajax({
-        type: "POST",
-        url: "/user/_logout",
-        data: "",
-        beforeSend: function(req) {
-          req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
-        },
-        success: function(req) {
-          document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
-        }
-      });
-    };
 
     this.save = function(userDoc, callback) {
       userdb.saveDoc(userDoc);
@@ -427,6 +391,8 @@ function localizeDates() {
       self.login(username, password, callback);
     }
   }
+  
+  
   
   
  function userNav(app) {
@@ -543,56 +509,29 @@ function localizeDates() {
       
       
       $("#logout").click(function() {
-        self.logout()
+        app.logout({
+          userdb: "user",
+          success: function() {
+            document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+          }
+        })
       });
       
       $("#flogin").submit(function(e) {
         e.preventDefault();
-        var lusername = $("#login_username"),
-        lpassword = $("#login_password");
-        
-        self.login(lusername, lpassword);
+        app.login({
+          userdb: "user",
+          username: $("#login_username").val(),
+          password: $("#login_password").val(),
+          success: function() {
+            $("#not_logged_in").hide();
+            $("#logged_in").show();
+          }
+        })
         return false;
       });
     }
     
-    this.logout = function() {
-      $.ajax({
-        type: "POST",
-        url: "/user/_logout",
-        data: "",
-        beforeSend: function(req) {
-          req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
-        },
-        success: function(req) {
-          document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
-        }
-      });
-    }
-    
-    this.login = function (username, password) {
-      var username = username.val(),
-          password = hex_sha1(password.val());
-      $.ajax({
-        type: "POST",
-        url: "/user/_login",
-        data: {
-          username: username,
-          password: password
-        },
-        beforeSend: function(req) {
-          req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
-        },
-        success: function(req) {
-          $("#not_logged_in").hide();
-          $("#logged_in").show();
-        },
-        error: function(req, status, error) {
-          var resp = $.httpData(req, "json");
-          alert(resp.reason);
-        }
-      });
-    }
     this.init()
   }
   
@@ -610,6 +549,9 @@ function localizeDates() {
       $("#login-popup").dialog('open');
       return false;
   });
+  
+  
+  
   
   $('.add').click(function(e) {
     e.preventDefault();
