@@ -164,7 +164,9 @@
                   doc.parentid = null;
               }
             });
-            $(".reply").click(fsubcomment);
+            $(".reply").click(function(e) {
+              var self = this;
+            });
           });
         })
       </script>

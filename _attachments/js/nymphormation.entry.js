@@ -1,4 +1,0 @@
-$(function() {
-  $.nymphormation = $.nymphormation || {};
-  
-})(jQuery);
