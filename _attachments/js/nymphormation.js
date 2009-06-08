@@ -272,7 +272,6 @@ function formToDeepJSON(form, fields, doc) {
 };
 
 function fsubcomment(app, obj) {
-
   var obj = obj;
   app.isLogged(function() {
     var self = obj;
@@ -449,13 +448,6 @@ function updateComments(app, linkid, docid) {
   
 }
 
-
-
-
-function itemPage(app, linkid, docid) {
-  
-  
-}
 
 function connectToChanges(app, fun) {
   function resetHXR(x) {
