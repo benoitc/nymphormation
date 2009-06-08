@@ -1,26 +1,183 @@
 body {
-    background-color: #EEEEEE;
-    color: #666666;
-    font-family: Verdana,Arial,'Bitstream Vera Sans',Helvetica,sans-serif;
-    font-size: 62.5%;
-    margin: 0 0 100px;
-    padding: 25px 25px 50px;
+    background-color: #fff;
+    color: #000;
+    font-family: Helvetica,Arial,sans-serif;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
 }
-* html { height: 100%; }
-ul, ol, li, h1, h2, h3, h4, h5, p { margin: 0 0 0.3em 0; padding: 0; }
-strong { font-weight: bold;}
-a:link { text-decoration: none; color: #2e8696; }
-a:visited { text-decoration: none; color: #2e8696; }
-a:hover { text-decoration: underline; }
-a:active { text-decoration: underline; }
+* html {
+    height: 100%;
+}
+ul, ol, li, h1, h2, h3, h4, h5, p {
+    margin: 0 0 0.3em 0;
+    padding: 0;
+}
 
-a {
-    color: #666666;
+
+
+#container {
+    left:100px;
+    margin:0 auto;
+    padding-top:10px;
+    position:relative;
+    width:770px;
+}
+
+#logpanel {
+    float: right;
+    padding-bottom: 10px;
+}
+
+#logpanel ul {
+    list-style: none;
+    
+}
+
+#logpanel ul li {
+    float: left;
+}
+#logpanel ul li a {
+    font-size: 12px;
+    color: #000;
+    text-decoration: none;
+}
+
+#logpanel ul li a:hover {
+    font-weight: bold;
     text-decoration: underline;
 }
-a:hover {
-    color: #CF1F36;
-    text-decoration: underline;
+
+strong {
+    font-weight: bold;
+}
+
+header#mainh {
+    display: block;
+    height: 150px;
+    clear: both;
+}
+
+#mainh h1 a {
+    color: #222222;
+    float: left;
+    font-size: 60px;
+    margin-top: 40px;
+    font-weight: bold;
+    letter-spacing: -2px;
+    padding: 5px 5px 5px 0;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 600px;
+    word-spacing: 5px;
+}
+#mainh ul {
+    float: right;
+}
+#mainh ul li {
+    background-color: #222222;
+    margin-bottom: 5px;
+    text-align: right;
+}
+#mainh ul li a {
+    color:#EEEEEE;
+    display:block;
+    font-size: 25px;
+    padding:5px;
+    text-decoration:none;
+}
+
+#mainh ul li a:hover{
+    background-color:#FFFFFF;
+    color:#1C6191;
+}
+
+
+section#content {
+    clear: both;
+  
+}
+
+article.item {
+    display: block;
+    border-top:5px solid #EEEEEE;
+    padding-bottom:20px;
+    padding-top:10px;
+}
+
+article.item h2 {
+    display:block;
+    font-size:35px;
+    letter-spacing:1px;
+    text-decoration:none;
+    text-transform:lowercase;
+}
+
+article.item h2 a {
+    color:#1C6191;
+    font-size:35px;
+    letter-spacing:1px;
+    text-decoration:none;
+    text-transform:lowercase;
+}
+article.item h2 a:hover {
+    background-color:#222222;
+    color:#EEEEEE;
+}
+
+article.item h2 span {
+    font-size: 60%;
+}
+
+article.item p a {
+    color:#000000;
+    font-weight:bold;
+    text-decoration:none;
+}
+article.item p a:hover {
+    text-decoration:underline;
+}
+
+aside.sidebar {
+    display: block;
+    left:-200px;
+    position:absolute;
+    width:190px;
+    z-index:10;
+}
+aside.sidebar ul li {
+    background-color:#222222;
+    color:#AAAAAA;
+    margin-bottom:5px;
+    overflow: hidden;
+    padding:5px;
+}
+ 
+aside.sidebar li div h3 {
+    color:#EEEEEE;
+    margin-bottom:10px;
+}
+aside.sidebar li div p {
+    padding-left:10px;
+    padding-right:10px;
+}
+aside.sidebar li div p {
+    font-size:13px;
+    line-height:14px;
+}
+aside.sidebar li div p a {
+    color:#FFFFFF;
+    font-weight:bold;
+    text-decoration:none;
+}
+aside.sidebar li div p a:hover {
+    text-decoration:underline;
+}
+
+aside.sidebar li.footer div p {
+    color:#EEEEEE;
+    font-size:14px;
+    line-height:17px;
 }
 
 .loginform {
@@ -44,51 +201,101 @@ a:hover {
     font-size: 80%;
     margin-bottom: 0.8em;
 }
-#signupdlg label, #signupdlg input {
-    display: block;
-}
-#signupdlg input.text {
-    margin-bottom: 12px;
-    width: 95%;
-    padding: .4em;
-}
-#signupdlg fieldset {
-    padding: 0;
-    border: 0;
-    margin-top: 25px;
-}
-#signupdlg h1 {
-    font-size: 1.2em;
-    margin: .6em 0;
-}
 
 
-#signupdlg .ui-button { outline: 0; margin:0; padding: .4em 1em .5em; text-decoration:none;  !important; cursor:pointer; position: relative; text-align: center; }
-#signupdlg .ui-dialog .ui-state-highlight, .ui-dialog .ui-state-error { padding: .3em;  }
 
-section#comments {
+#comments {
     display: block;
     margin-top: 20px;
 }
 
 ol, ul {
-list-style-image:none;
-list-style-position:outside;
-list-style-type:none;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
 }
 
 li ul {
-  margin: 15px;  
+    margin: 15px;
 }
-li.comment { 
-    margin-bottom: 7px; 
+li.comment {
+    margin-bottom: 7px;
     clear: both;
-    
 }
-.subcomment, #newcomment { width: 450px; margin-bottom: 5px;}
-.subcomment textarea, #newcomment textarea { width: 450px; height: 70px; }
-.show-help { float: right; clear: right; }
-.subcomment input { float: left; }
-table.help { clear: both; width: 100%; }
-.subcomment form, #newcomment form { margin: 0;}
-form ol, form ol li { text-indent: 0; margin: 0; padding: 0;}
+.subcomment, #newcomment {
+    width: 450px;
+    margin-bottom: 5px;
+}
+.subcomment textarea, #newcomment textarea {
+    width: 450px;
+    height: 70px;
+}
+.show-help {
+    float: right;
+    clear: right;
+}
+.subcomment input {
+    float: left;
+}
+table.help {
+    clear: both;
+    width: 100%;
+}
+.subcomment form, #newcomment form {
+    margin: 0;
+}
+form ol, form ol li {
+    text-indent: 0;
+    margin: 0;
+    padding: 0;
+}
+
+
+#login-popup {
+    display: none;
+    
+    position: fixed;
+    top: 17%;
+    left: 50%;
+    
+    margin-left: -300px;
+    width: 650px;
+    
+    background-color: #EEE;
+    color: #333;
+    border: 1px solid black;
+    padding: 12px;
+}
+
+#login-popup h2 {
+    text-align: center;
+    padding-bottom: 15px;
+}
+#login-popup a.close {
+    clear: both;
+    display: block;
+    width: 120px;
+    margin: 0 auto;
+    color: #000;
+    text-align: center;
+}
+
+#login-popup a.close:hover {
+    color: #fff;
+    background: #000;
+}
+.jqmOverlay { background-color: #000; }
+
+/* Background iframe styling for IE6. Prevents ActiveX bleed-through (<select> form elements, etc.) */
+* iframe.jqm {position:absolute;top:0;left:0;z-index:-1;
+	width: expression(this.parentNode.offsetWidth+'px');
+	height: expression(this.parentNode.offsetHeight+'px');
+}
+
+/* Fixed posistioning emulation for IE6
+     Star selector used to hide definition from browsers other than IE6
+     For valid CSS, use a conditional include instead */
+* html #login-popup {
+     position: absolute;
+     top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(17 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px');
+}

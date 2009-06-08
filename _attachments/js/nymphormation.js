@@ -14,6 +14,50 @@
 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+// Localize the display of <time> elements
+function localizeDates() {
+    var lastdate = '';
+    var now = new Date();
+
+    $('time').each(function() {
+       var el = this;
+
+        if (el.getAttribute('title') == "GMT") {
+            var date = new Date(Date.parseRFC3339(el.getAttribute('datetime')));
+            if (!date.getTime())
+                return;
+            diff = ((now.getTime() - date.getTime()) / 1000),
+            day_diff = Math.floor(diff / 86400);
+            if ( isNaN(day_diff) || day_diff < 0 || day_diff >= 31 )
+                return;
+            var text = date.toLocaleString();
+            var title = date.toLocaleString();
+            
+            if (day_diff == 0) {
+                text = (diff < 60 && "Just Now" ||
+                diff < 120 && "1 minute ago" ||
+                diff < 3600 && Math.floor( diff / 60 ) + " minutes ago" ||
+                diff < 7200 && "1 hour ago" ||
+                diff < 86400 && Math.floor( diff / 3600 ) + " hours ago");
+                title = date.toLocaleTimeString();
+            } else {
+                hours = date.getHours();
+                minutes = date.getMinutes();
+                hours = (hours < 10) && "0" + hours || hours;
+                minutes = (minutes < 10) && "0" + minutes || minutes;
+                text = (day_diff == 1 && "Yesterday at " +  hours + ":" + minutes ||
+                        day_diff < 7 && day_diff + " days ago at "  +  hours + ":" + minutes ||    
+                        el.textContent);
+                title = date.toLocaleString();
+            }
+            el.setAttribute('title', title);
+            el.textContent = text;
+        }
+    });
+
+}
+
+
 function parseUri(sourceUri){
    /* parseUri by Steven Levithan (http://badassery.blogspot.com) */
     var uriPartNames = ["source","protocol","authority","domain","port","path","directoryPath","fileName","query","anchor"];
@@ -56,16 +100,19 @@ function updateChanges(app) {
             nb_comments[row.key] = row.value;
           }
           
-          $("#news").html(data.rows.map(function(row) {
+          $("#content").html(data.rows.map(function(row) {
             var news = row.value;
             url = parseUri(news.url)
             var nb = nb_comments[news._id] || 0;
+            var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
             return '<article class="item">'
-            + '<h1><a href="'+ news.url + '">' + news.title + '</a> <span clas="host">'+url.domain+'</span></h1>'
-            + '<p><span class="author">'+ news.author + '</span>'
-            + '<span class="comments"><a href="' + app.showPath("item", news._id) +'">'
+            + '<h2><a href="'+ news.url + '">' + news.title + '</a> <span clas="host">'+url.domain+'</span></h2>'
+            + '<p><span class="author">by '+ news.author + '</span> '
+            + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
+            + '<span class="nb_comments"><a href="' + app.showPath("item", news._id) +'">'
             + ' ' + nb + ' comments</a></span</p></article>';
           }).join(''));
+          localizeDates();
         }
       });  
     }
@@ -315,259 +362,154 @@ function connectToChanges(app, fun) {
   }});
 };
 
-// Localize the display of <time> elements
-function localizeDates() {
-    var lastdate = '';
-    var now = new Date();
 
-    $('time').each(function() {
-       var el = this;
+function Login(app, options) {
+  var app = app;
+  var options = options || {};
+  var tips = $("#signup-tips");
+  var userdb = $.couch.db("user");
+  
+  function updateTips(t) {
+      tips.text(t).fadeIn(1500);
+  }
 
-        if (el.getAttribute('title') == "GMT") {
-            var date = new Date(Date.parseRFC3339(el.getAttribute('datetime')));
-            if (!date.getTime())
-                return;
-            diff = ((now.getTime() - date.getTime()) / 1000),
-            day_diff = Math.floor(diff / 86400);
-            if ( isNaN(day_diff) || day_diff < 0 || day_diff >= 31 )
-                return;
-            var text = date.toLocaleString();
-            var title = date.toLocaleString();
-            
-            if (day_diff == 0) {
-                text = (diff < 60 && "Just Now" ||
-                diff < 120 && "1 minute ago" ||
-                diff < 3600 && Math.floor( diff / 60 ) + " minutes ago" ||
-                diff < 7200 && "1 hour ago" ||
-                diff < 86400 && Math.floor( diff / 3600 ) + " hours ago");
-                title = date.toLocaleTimeString();
-            } else {
-                hours = date.getHours();
-                minutes = date.getMinutes();
-                hours = (hours < 10) && "0" + hours || hours;
-                minutes = (minutes < 10) && "0" + minutes || minutes;
-                text = (day_diff == 1 && "Yesterday at " +  hours + ":" + minutes ||
-                el.textContent);
-                title = date.toLocaleString();
-            }
-            el.setAttribute('title', title);
-            el.textContent = "posted " + text;
+  function checkLength(o, n, min, max) {
+      if (o.val().length > max || o.val().length < min) {
+          o.addClass('ui-state-error');
+          updateTips("Length of " + n + " must be between " + min + " and " + max + ".");
+          return false;
+      } else {
+          return true;
+      }
+  }
+
+  function checkRegexp(o, regexp, n) {
+      if (! (regexp.test(o.val()))) {
+          o.addClass('ui-state-error');
+          updateTips(n);
+          return false;
+      } else {
+          return true;
+      }
+  }
+  
+  
+  $("#login-popup").jqmShow();
+  $("a.close").click(function() {
+    $("#login-popup").jqmHide();
+    return false;
+  })
+  $("#flogin").submit(function(e) {
+      e.preventDefault();
+      app.login({
+        userdb: "user",
+        username: $("#user").val(),
+        password: $("#passwd").val(),
+        success: function() {
+          $("#login-popup").jqmHide();
+          if (options.success) options.success();
         }
-    });
+      });
+      return false;
+  });
+  
+  $("#fsignup").submit(function(e) {
+    e.preventDefault();
+    var bValid = true;
+    var username = $("#username"),
+    email = $("#email"),
+    password = $("#password"),
+    allFields = $([]).add(username).add(email).add(password);
+    
+    
+    allFields.removeClass('ui-state-error');
 
-}
-
-
-(function($) {
-  $.nymphormation = $.nymphormation || {};
-
-  function User(app) {
-    var app = app;
-    var userdb = $.couch.db("user");
-
-    var self = this;
-
-
-    this.save = function(userDoc, callback) {
-      userdb.saveDoc(userDoc);
-      if (typeof calback != "undefined")
-        callback(userDoc);
-    }
-
-    this.register = function(name, username, password, email, callback) {
-      var salt = Math.uuidHex();
-      var password_hash = b64_sha1(salt + hex_sha1(password));
-
+    bValid = bValid && checkLength(username, "username", 3, 16);
+    bValid = bValid && checkLength(email, "email", 6, 80);
+    bValid = bValid && checkLength(password, "password", 5, 16);
+    
+    bValid = bValid && checkRegexp(username, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter.");
+		bValid = bValid && checkRegexp(email,/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i,"eg. contact&nymphormation.com");
+    bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
+    
+    if (bValid) {
+      var salt = Math.uuid();
+      var password_hash = b64_sha1(salt + hex_sha1(password.val()));
+      
       var user = {
-        fullname: escapeHTML(fullname.val()),
-        username: username,
-        email: email,
+        username: username.val(),
+        email: email.val(),
         password: password_hash,
         salt: salt,
         type: "user"
       };
-
+      
       userdb.saveDoc(user);
-      self.login(username, password, callback);
-    }
-  }
-  
-  
-  
-  
- function userNav(app) {
-   var app = app;
-    var userdb = $.couch.db("user");
-    var userCtx = { name: null, roles: []};
-    var fullname = $("#fullname"),
-    username = $("#username"),
-    email = $("#email"),
-    password = $("#password"),
-    allFields = $([]).add(fullname).add(username).add(email).add(password),
-    tips = $("#validateTips");
-    
-    function updateTips(t) {
-        tips.text(t).effect("highlight", {},
-        1500);
-    }
-
-    function checkLength(o, n, min, max) {
-
-        if (o.val().length > max || o.val().length < min) {
-            o.addClass('ui-state-error');
-            updateTips("Length of " + n + " must be between " + min + " and " + max + ".");
-            return false;
-        } else {
-            return true;
+      app.login({
+        userdb: "user",
+        username: username.val(),
+        password: password.val(),
+        success: function() {
+          $("#login-popup").jqmHide();
+          if (options.success) options.success();
+        },
+        error: function(s, e, r) {
+          $("#login-popup").jqmHide();
+          alert("An error occurred logging in: " + r);
         }
-
-    }
-
-    function checkRegexp(o, regexp, n) {
-        if (! (regexp.test(o.val()))) {
-            o.addClass('ui-state-error');
-            updateTips(n);
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
-    function checkEmail(o, n) {
-      s = o.val();
-      if (! s.match(/(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*")@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$/i)) {
-        o.addClass('ui-state-error');
-        updateTips(n);
-        return  false;
-      } else {
-        return true;
-      }
-    }
-    
-    var self = this;
-    
-    this.init = function() {
-      $.getJSON(app.showPath('userctx', ""), function(data) {
-        var is_logged = data.is_logged;
-        if (!is_logged) {
-          $("#not_logged_in").show();
-          $.cookies.remove("NYMPHORMATION_ID", "/");
-        } else {
-          var username = data['userCtx']['name'];
-          $.cookies.set("NYMPHORMATION_ID", username, "/");
-          $("#logged_in").show();
-        }
-        
-      });
-      
-      $("#signupdlg").dialog({
-        bgiframe: true,
-        autoOpen: false,
-        height: 300,
-        modal: true,
-        buttons: {
-          'Create an account': function() {
-            var bValid = true;
-            allFields.removeClass('ui-state-error');
-
-            bValid = bValid && checkLength(fullname, "fullname", 3, 50);
-            bValid = bValid && checkLength(username, "username", 3, 16);
-            bValid = bValid && checkLength(email, "email", 6, 80);
-            bValid = bValid && checkLength(password, "password", 5, 16);
-            
-            bValid = bValid && checkRegexp(username, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter.");
-            bValid = bValid && checkEmail(email, "Invalid email address. Should be formatted like contact@nymphormation.com");
-		    bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
-
-		    if (bValid) {
-              var salt = Math.uuid();
-              var password_hash = b64_sha1(salt + hex_sha1(password.val()));
-              
-				      var user = {
-				        fullname: escapeHTML(fullname.val()),
-				        username: username.val(),
-				        email: email.val(),
-				        password: password_hash,
-				        salt: salt,
-				        type: "user"
-				      };
-				      
-				      userdb.saveDoc(user);
-				      self.login(username, password);
-			        $(this).dialog('close');
-		        }
-	        },
-		      Cancel: function() {
-			      $(this).dialog('close');
-		      }
-	      },
-	      close: function() {
-		      allFields.val('').removeClass('ui-state-error');
-	      }
-      });
-      
-      
-      
-      $("#logout").click(function() {
-        app.logout({
-          userdb: "user",
-          success: function() {
-            document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
-          }
-        })
-      });
-      
-      $("#flogin").submit(function(e) {
-        e.preventDefault();
-        app.login({
-          userdb: "user",
-          username: $("#login_username").val(),
-          password: $("#login_password").val(),
-          success: function() {
-            $("#not_logged_in").hide();
-            $("#logged_in").show();
-          }
-        })
-        return false;
       });
     }
-    
-    this.init()
-  }
-  
-  $("#login-popup").dialog({
-    bgiframe: true,
-    autoOpen: false,
-    height: 300,
-    width: 650,
-    modal: true,
-    resizable: false
-  });
-  
-  $("#signup").click(function() {
-      //$('#signupdlg').dialog('open');
-      $("#login-popup").dialog('open');
-      return false;
-  });
-  
-  
-  
-  
-  $('.add').click(function(e) {
-    e.preventDefault();
-    $.CouchApp(function(app) {
-      app.isLogged(function() {
-        document.location = app.showPath("item");
-      }, function() {
-        $("#login-popup").dialog('open');
-      });
-    })
-    
-    
     return false;
-  })
+  });
   
   
+}
+
+function userNav(app) {
+  var href = document.location;
+  app.isLogged(function(data) {
+     $('.userprofile').autoRender({ userprofile: data.userCtx.name })
+     $(".logged_in").show();
+   }, function() {
+     $(".not_logged_in").show();
+     $("#login").click(function(e){
+       e.preventDefault();
+       Login(app, {
+         success: function() {
+           document.location = href;
+         }
+       });
+       return false;
+     });
+   });
+   
+   $("#logout").click(function() {
+     app.logout({
+       userdb: "user",
+       success: function() {
+         document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+       }
+     });
+   });
+   
+   $("a.add").click(function() {
+      var href = $(this).attr("href");
+       app.isLogged(function() {
+         document.location = href;
+       }, function() {
+         new Login(app, {
+           success: function() {
+             document.location = href;
+           }
+         });
+       });
+       return false;
+    });
+}
+
+(function($) {
+  $("#login-popup").jqm();
+
   $(".nf-button")
     .hover(
   		function() {
@@ -588,10 +530,8 @@ function localizeDates() {
 		})
 		.mouseout(function(ev) {
 		  ev.stopPropagation();
-		})
-  
-  $.extend($.nymphormation, {
-     userNav: userNav
-  });
+		});
+		
+	  
 
 })(jQuery);
