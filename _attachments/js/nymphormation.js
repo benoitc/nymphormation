@@ -167,8 +167,6 @@ function Login(app, options) {
     }
     return false;
   });
-  
-  
 }
 
 function parseUri(sourceUri){
@@ -227,7 +225,9 @@ function updateChanges(app) {
             var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
             
             
-            return '<article class="item">'
+            return '<article class="item" id="'+news._id+'">'
+            + '<div class="vote" id="v'+news._id+'"><img src="images/c-bury.png" alt="down" class="down">'
+            + '<img src="images/c-digg.png" alt="up" class="up"></div>'
             + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
             + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
             + news.author.gravatar +'?s=22&d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')+'">'
@@ -240,6 +240,32 @@ function updateChanges(app) {
             
           }).join(''));
           localizeDates();
+          
+          function vote(obj, value) {
+            var id = $(obj).parent().attr("id").substr(1);
+            var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+            var d = $('article#'+ id + " time").attr("datetime");
+            
+            var vote = {
+              itemid: id,
+              d: d,
+              v: value,
+              author: { 
+                username: cookie[0],
+                gravatar: cookie[1]
+              },
+              type: "vote",
+            }
+            
+            app.db.saveDoc(vote);
+          }
+          
+          $(".up").click(function(e) {
+            vote(this, 1);
+          });
+          $(".down").click(function(e) {
+            vote(this, -1);
+          });
         }
       });  
     }
@@ -249,9 +275,12 @@ function updateChanges(app) {
 function newestPage(app) {
   
   updateChanges(app);
+  
   connectToChanges(app, function() {
     updateChanges(app);
   });
+  
+  
 }
 
 

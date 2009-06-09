@@ -169,7 +169,19 @@
                 }
               },
               success: function(resp, doc) {
-                document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+                var vote = {
+                  itemid: doc._id,
+                  d: doc.created_at,
+                  v: 1,
+                  author: doc.author,
+                  type: "vote",
+                }
+                app.db.saveDoc(vote, {
+                  success: function() {
+                    document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+                  }
+                })
+                
               }
             });
           });
