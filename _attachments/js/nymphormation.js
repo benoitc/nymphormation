@@ -57,6 +57,8 @@ function localizeDates() {
 
 }
 
+
+// manage login. ask to register if needed
 function Login(app, options) {
   var app = app;
   var options = options || {};
@@ -215,7 +217,7 @@ function updateChanges(app) {
             return '<article class="item">'
             + '<h2><a href="'+ news.url + '">' + news.title + '</a> <span clas="host">'+url.domain+'</span></h2>'
             + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
-            + news.author.gravatar +'?s=16" alt=""> '+ news.author.username + '</span> '
+            + news.author.gravatar +'?s=16&d=identicon" alt=""> '+ news.author.username + '</span> '
             + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
             + '<span class="nb_comments"><a href="' + app.showPath("item", news._id) +'">'
             + ' ' + nb + ' comments</a></span</p></article>';
@@ -278,31 +280,15 @@ function formToDeepJSON(form, fields, doc) {
   });
 };
 
-function fsubcomment(app, obj) {
-  var obj = obj;
-  app.isLogged(function() {
-    var self = obj;
-    var link_id = $(self).attr('id');
-    var ids= link_id.split("_");
-    cform = $('<form id=""></form');
-    $(cform).append('<input type="hidden" name="linkid" value="'+ ids[1] +'">'
-    + '<input type="hidden" name="parentid" value="'+ ids[0] + '">'
-    + '<textarea name="body" class="scomment"></textarea>');
-    rsubmit=$('<div class="submit-row"></div>')
-    bsubmit = $('<input type="submit" name="bsubmit" value="comment">');
-    bcancel = $('<input type="reset" name="bcancel" value="cancel">');
-    bcancel.click(function() {
-        $(self).next().remove();
-    });
-
-
-    $(cform).submit(function(e) {
-      e.preventDefault();
+function submitComment(app, form) {
+  var href = document.location;
+  var app = app;
+   
       var localFormDoc = {
         type: "comment",
       }
 
-      formToDeepJSON(this, ["body", "linkid", "parentid"], localFormDoc);
+      formToDeepJSON(form, ["body", "linkid", "parentid"], localFormDoc);
       if (!localFormDoc.body) {
         alert("Comment required");
         return false;
@@ -327,16 +313,35 @@ function fsubcomment(app, obj) {
           localFormDoc.path = path;
           app.db.saveDoc(localFormDoc, {
             success: function(resp) {
-              notice = $('<div class="notice" type="z-index:1002; position:fixed;">comment added</div>');
-              notice.appendTo(document.body).noticeBox().fadeIn(400);
-              $(self).next().remove();
+              document.location = href;
             }
           });
       
         }
       });    
-      return false; 
+     
+  
+}
+
+function fsubcomment(app, obj) {
+  var obj = obj;
+  app.isLogged(function() {
+    var self = obj;
+    var link_id = $(self).attr('id');
+    var ids= link_id.split("_");
+    cform = $('<form id=""></form');
+    $(cform).append('<input type="hidden" name="linkid" value="'+ ids[1] +'">'
+    + '<input type="hidden" name="parentid" value="'+ ids[0] + '">'
+    + '<textarea name="body" class="scomment"></textarea>');
+    rsubmit=$('<div class="submit-row"></div>')
+    bsubmit = $('<input type="submit" name="bsubmit" value="comment">');
+    bcancel = $('<input type="reset" name="bcancel" value="cancel">');
+    bcancel.click(function() {
+        $(self).next().remove();
     });
+
+
+   
 
     help = $('<a href="#" class="show-help">help</a>');
     help.click(function() {       
@@ -348,11 +353,16 @@ function fsubcomment(app, obj) {
     $(rsubmit).append(bcancel);
     $(rsubmit).append(help);
     $(cform).append(rsubmit);
-
+    $(cform).submit(function(e) {
+        e.preventDefault();
+        submitComment(app, this);
+        return false;
+    });
     cdiv = $('<div class="subcomment"></div>');
     $(cdiv).append(cform);
 
     $(self).parent().append(cdiv);
+    
   }, function() {
     new Login(app, {
        success: function() {
@@ -364,11 +374,10 @@ function fsubcomment(app, obj) {
 }
 
 
-
-function updateComments(app, linkid, docid) {
-  var docid = docid;
-  var linkid = linkid;
-  var app = app;
+function updateComments(app, linkid, docid, cache) {
+  var docid = docid,
+  linkid = linkid,
+  app = app;
   
   function children(parentid, rows, comments, idx_comments) {
     for(var v=0; v < rows.length; v++) {
@@ -455,19 +464,6 @@ function updateComments(app, linkid, docid) {
       return true;
     }
   });
-  
-  
-}
-
-
-function itemPage(app, linkid, docid) {
-  
-  var app = app,
-  linkid = linkid,
-  docid = docid;
-  
-  var cache = {};
-  
   
   
 }

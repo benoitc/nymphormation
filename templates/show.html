@@ -63,7 +63,7 @@
               <% if (doc.title) { %>
               <h2><a href="<%= doc.url %>"><%= doc.title %></a></h2>
               <% } %>
-              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %></p>
+              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %></p>
             
               <% if (doc.body) { %>
               <p><%= doc.body %></p>
@@ -136,39 +136,22 @@
             localizeDates();
 
             updateComments(app, "<%= linkid %>", "<%= doc._id %>");
-            var tips = $("#validateTips");
             
-            function updateTips(t) {
-                tips.text(t).effect("highlight", {},
-                1500);
-            }
-            
-            var entryForm = app.docForm("form#fcomment", {
-              fields: ["body", "linkid", "parentid"],
-              template: {
-                  path: <%= path %>,
-                  type: "comment",
-              },
-              validForm: function(doc) {
-                  if (!doc.body) {
-                    updateTips("Comment required");
-                    return false;
+            $("form#fcomment").submit(function() {
+              var form = this;
+              app.isLogged(function() {
+                submitComment(app, form);
+              }, function() {
+                Login(app, {
+                  success: function() {
+                    var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+                    submitComment(app, form);
                   }
-                  
-                  return true;
-              },
-              beforeSave: function(doc) {
-                doc.created_at = new Date().rfc3339();
-                if (!doc.parentid)
-                  doc.parentid = null;
-                  
-                var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
-                doc.author = { 
-                  username: cookie[0],
-                  gravatar: cookie[1]
-                }
-              }
+                });
+              });
+              return false;
             });
+            
             
           });
         })
