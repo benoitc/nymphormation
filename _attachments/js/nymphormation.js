@@ -87,23 +87,41 @@ function Login(app, options) {
       }
   }
   
+  function login(username, password) {
+    app.login({
+      userdb: "user",
+      username: username,
+      password: password,
+      success: function() {
+        userdb.view("profile/profile", {
+          key: username,
+          success: function(json) {
+            var profile = json.rows[0].value;
+            $.cookies.set("NYMPHORMATION_ID", 
+              profile['username'] + ";" + profile['gravatar'],
+              "/");
+            $("#login-popup").jqmHide();
+            if (options.success) options.success();
+          }
+        });
+        
+      },
+      error: function(s, e, r) {
+        $("#login-popup").jqmHide();
+        alert("An error occurred logging in: " + r);
+      }
+    });
+  }
   
   $("#login-popup").jqmShow();
   $("a.close").click(function() {
     $("#login-popup").jqmHide();
     return false;
-  })
+  });
+ 
   $("#flogin").submit(function(e) {
       e.preventDefault();
-      app.login({
-        userdb: "user",
-        username: $("#user").val(),
-        password: $("#passwd").val(),
-        success: function() {
-          $("#login-popup").jqmHide();
-          if (options.success) options.success();
-        }
-      });
+      login($("#user").val(), $("#passwd").val())
       return false;
   });
   
@@ -139,19 +157,7 @@ function Login(app, options) {
       };
       
       userdb.saveDoc(user);
-      app.login({
-        userdb: "user",
-        username: username.val(),
-        password: password.val(),
-        success: function() {
-          $("#login-popup").jqmHide();
-          if (options.success) options.success();
-        },
-        error: function(s, e, r) {
-          $("#login-popup").jqmHide();
-          alert("An error occurred logging in: " + r);
-        }
-      });
+      login(username.val(), password.val());
     }
     return false;
   });
@@ -208,7 +214,8 @@ function updateChanges(app) {
             var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
             return '<article class="item">'
             + '<h2><a href="'+ news.url + '">' + news.title + '</a> <span clas="host">'+url.domain+'</span></h2>'
-            + '<p><span class="author">by '+ news.author + '</span> '
+            + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
+            + news.author.gravatar +'?s=16" alt=""> '+ news.author.username + '</span> '
             + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
             + '<span class="nb_comments"><a href="' + app.showPath("item", news._id) +'">'
             + ' ' + nb + ' comments</a></span</p></article>';
@@ -293,8 +300,7 @@ function fsubcomment(app, obj) {
       e.preventDefault();
       var localFormDoc = {
         type: "comment",
-        author: username
-      };
+      }
 
       formToDeepJSON(this, ["body", "linkid", "parentid"], localFormDoc);
       if (!localFormDoc.body) {
@@ -305,6 +311,11 @@ function fsubcomment(app, obj) {
       localFormDoc.created_at = new Date().rfc3339();
       if (!localFormDoc.parentid) {
         localFormDoc.parentid = null;
+      }
+      var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+      localFormDoc.author = { 
+        username: cookie[0],
+        gravatar: cookie[1]
       }
       app.db.openDoc(localFormDoc.parentid,{ 
         success: function(json) {
@@ -406,7 +417,7 @@ function updateComments(app, linkid, docid) {
       var c = thread[i];
       var fcreated_at = new Date().setRFC3339(c.created_at).toLocaleString();
       ret += '<li class="comment" id="'+c._id + '">'
-      + '<p class="meta">by <a href="#">'+ c.author + '</a> '
+      + '<p class="meta">by <a href="#">'+ c.author.username + '</a> '
       + '<time title="GMT" datetime="' + c.created_at + '" class="caps">'
       + fcreated_at + '</time></p>'
       + '<div class="text">' + c.body + '</div>';
@@ -482,6 +493,7 @@ function connectToChanges(app, fun) {
 function userNav(app) {
   var href = document.location;
   app.isLogged(function(data) {
+     // get user profile
      $('.userprofile').autoRender({ userprofile: data.userCtx.name })
      $(".logged_in").show();
    }, function() {
@@ -501,6 +513,9 @@ function userNav(app) {
      app.logout({
        userdb: "user",
        success: function() {
+         try {
+           $.cookies.remove("NYMPHORMATION_ID", "/");
+         } catch (e) {}
          document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
        }
      });

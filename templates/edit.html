@@ -134,7 +134,6 @@
             }
 
             function checkLength(v, n, min, max) {
-
                 if (v.length > max || v.length < min) {
                     o.addClass('ui-state-error');
                     updateTips("Length of " + n + " must be between " + min + " and " + max + ".");
@@ -142,32 +141,32 @@
                 } else {
                     return true;
                 }
-
             }
 
             var entryForm = app.docForm("form#fedit", {
               fields: ["title", "url", "body"],
               template: {
-                  type: "link",
-                  author: "<%= username %>"
+                  type: "link"
               },
               validForm: function(doc) {
                   if (!doc.title) {
                     updateTips("Title required");
                     return false;
                   }
-
                   checkLength(doc.title, "title", 3, 50);
-                  
                   if (!doc.body && !doc.url) {
                     updateTips("Text or Url are empty.");
                     return false;
                   }
-                    
                   return true;
               },
               beforeSave: function(doc) {
                 doc.created_at = new Date().rfc3339();
+                var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+                doc.author = { 
+                  username: cookie[0],
+                  gravatar: cookie[1]
+                }
               },
               success: function(resp, doc) {
                 document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";

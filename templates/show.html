@@ -63,7 +63,7 @@
               <% if (doc.title) { %>
               <h2><a href="<%= doc.url %>"><%= doc.title %></a></h2>
               <% } %>
-              <p class="metadata">by <a href="#" rel="author"><%= doc.author %></a> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %></p>
+              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %></p>
             
               <% if (doc.body) { %>
               <p><%= doc.body %></p>
@@ -148,7 +148,6 @@
               template: {
                   path: <%= path %>,
                   type: "comment",
-                  author: "<%= username %>"
               },
               validForm: function(doc) {
                   if (!doc.body) {
@@ -162,6 +161,12 @@
                 doc.created_at = new Date().rfc3339();
                 if (!doc.parentid)
                   doc.parentid = null;
+                  
+                var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+                doc.author = { 
+                  username: cookie[0],
+                  gravatar: cookie[1]
+                }
               }
             });
             
