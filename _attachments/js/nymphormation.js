@@ -191,7 +191,7 @@ function updateChanges(app) {
         ids.push(data.rows[i].value['_id']);
       }
       
-      app.view("comments", {
+      app.view("nbcomments", {
         keys: ids,
         group: true,
         success: function(json) {
@@ -448,6 +448,18 @@ function updateComments(app, linkid, docid) {
   
 }
 
+
+function itemPage(app, linkid, docid) {
+  
+  var app = app,
+  linkid = linkid,
+  docid = docid;
+  
+  var cache = {};
+  
+  
+  
+}
 
 function connectToChanges(app, fun) {
   function resetHXR(x) {
