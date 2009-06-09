@@ -13,7 +13,6 @@ function(head, row, req, row_info) {
          req: toJSON(req)
        });
      } else if (row) {
-       
        var fcreated_at = new Date().setRFC3339(row.value.created_at).toLocaleString();
        return template(templates.comments.row, {
          doc: row.value,
