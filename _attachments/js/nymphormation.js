@@ -158,8 +158,12 @@ function Login(app, options) {
         type: "user"
       };
       
-      userdb.saveDoc(user);
-      login(username.val(), password.val());
+      userdb.saveDoc(user, {
+        success: function() {
+          login(username.val(), password.val());
+        }
+      });
+      
     }
     return false;
   });
@@ -217,10 +221,14 @@ function updateChanges(app) {
             return '<article class="item">'
             + '<h2><a href="'+ news.url + '">' + news.title + '</a> <span clas="host">'+url.domain+'</span></h2>'
             + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
-            + news.author.gravatar +'?s=16&d=identicon" alt=""> '+ news.author.username + '</span> '
+            + news.author.gravatar +'?s=22&d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')+'">'
+            + news.author.username + '</a></span> '
             + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
-            + '<span class="nb_comments"><a href="' + app.showPath("item", news._id) +'">'
-            + ' ' + nb + ' comments</a></span</p></article>';
+            + ' <span class="nb_comments"><a href="' + app.showPath("item", news._id) +'">'
+            + nb + ' comments</a></span</p></article>';
+            
+            
+            
           }).join(''));
           localizeDates();
         }
@@ -252,6 +260,8 @@ markdown_help = function(obj) {
         $(obj).html('help');
     } else {
         $(obj).html('hide help');
+      
+        
         $(obj).parent().append('<table class="help">'+
         '<tr><th>you type:</th><th>you see:</th></tr>'+
         '<tr><td>*italics*</td><td><em>italics</em></td></tr>'+
@@ -284,43 +294,41 @@ function submitComment(app, form) {
   var href = document.location;
   var app = app;
    
-      var localFormDoc = {
-        type: "comment",
-      }
+  var localFormDoc = {
+    type: "comment",
+  }
 
-      formToDeepJSON(form, ["body", "linkid", "parentid"], localFormDoc);
-      if (!localFormDoc.body) {
-        alert("Comment required");
-        return false;
-      }
-  
-      localFormDoc.created_at = new Date().rfc3339();
-      if (!localFormDoc.parentid) {
-        localFormDoc.parentid = null;
-      }
-      var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
-      localFormDoc.author = { 
-        username: cookie[0],
-        gravatar: cookie[1]
-      }
-      app.db.openDoc(localFormDoc.parentid,{ 
-        success: function(json) {
-          if (json.path == undefined)
-            path = [];
-          else
-            path = json.path;
-          path.push(localFormDoc.parentid);
-          localFormDoc.path = path;
-          app.db.saveDoc(localFormDoc, {
-            success: function(resp) {
-              document.location = href;
-            }
-          });
-      
+  formToDeepJSON(form, ["body", "linkid", "parentid"], localFormDoc);
+  if (!localFormDoc.body) {
+    alert("Comment required");
+    return false;
+  }
+
+  localFormDoc.created_at = new Date().rfc3339();
+  if (!localFormDoc.parentid) {
+    localFormDoc.parentid = null;
+  }
+  var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+  localFormDoc.author = { 
+    username: cookie[0],
+    gravatar: cookie[1]
+  }
+  app.db.openDoc(localFormDoc.parentid,{ 
+    success: function(json) {
+      if (json.path == undefined)
+        path = [];
+      else
+        path = json.path;
+      path.push(localFormDoc.parentid);
+      localFormDoc.path = path;
+      app.db.saveDoc(localFormDoc, {
+        success: function(resp) {
+          document.location = href;
         }
-      });    
+      });
+    }
+  });    
      
-  
 }
 
 function fsubcomment(app, obj) {
@@ -340,12 +348,9 @@ function fsubcomment(app, obj) {
         $(self).next().remove();
     });
 
-
-   
-
     help = $('<a href="#" class="show-help">help</a>');
     help.click(function() {       
-        markdown_help(self);
+        markdown_help(this);
         return false;
     });
 
@@ -456,8 +461,7 @@ function updateComments(app, linkid, docid, cache) {
       }
       $(".reply").click(function(e) {
         if ($(this).next().is('.subcomment'))
-            return false;
-            
+            return false;    
         new fsubcomment(app, this);
         return false;
       });

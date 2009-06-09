@@ -1,10 +1,62 @@
+/* RESET */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ul, li,
+form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: normal;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+}
+ 
+:focus {
+    outline: 0;
+}
+ 
+body {
+    line-height: 1;
+    color: black;
+    background: white;
+}
+ 
+ul {
+    list-style: none;
+}
+ 
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+ 
+caption, th, td {
+    text-align: left;
+    font-weight: normal;
+}
+ 
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: "";
+}
+ 
+blockquote, q {
+    quotes: "" "";
+}
+
 body {
     background-color: #fff;
     color: #000;
     font-family: Helvetica,Arial,sans-serif;
     margin: 0;
     padding: 0;
-    font-size: 12px;
 }
 * html {
     height: 100%;
@@ -15,18 +67,19 @@ ul, ol, li, h1, h2, h3, h4, h5, p {
 }
 
 
+table {
+    border-collapse: collapse;
+}
 
 #container {
-    left:100px;
-    margin:0 auto;
     padding-top:10px;
     position:relative;
-    width:770px;
+    min-width:770px;
 }
 
 #logpanel {
     float: right;
-    padding-bottom: 10px;
+    padding-right: 10px;
 }
 
 #logpanel ul {
@@ -54,25 +107,32 @@ strong {
 
 header#mainh {
     display: block;
-    height: 150px;
+    height: 140px;
     clear: both;
 }
 
+
+#mainh h1 {
+    display: block;
+    position:relative;
+    width: 400px;
+    left: 220px;
+}
 #mainh h1 a {
     color: #222222;
     float: left;
-    font-size: 60px;
-    margin-top: 40px;
+    font-size: 2.4em;
+    margin-top: 20px;
     font-weight: bold;
     letter-spacing: -2px;
     padding: 5px 5px 5px 0;
     text-decoration: none;
     text-transform: uppercase;
-    width: 600px;
     word-spacing: 5px;
 }
 #mainh ul {
     float: right;
+    margin-right: 10px;
 }
 #mainh ul li {
     background-color: #222222;
@@ -82,7 +142,7 @@ header#mainh {
 #mainh ul li a {
     color:#EEEEEE;
     display:block;
-    font-size: 25px;
+    font-size:  1.3em;
     padding:5px;
     text-decoration:none;
 }
@@ -94,28 +154,31 @@ header#mainh {
 
 
 section#content {
-    clear: both;
-  
+
+    display: block;
+    position: relative;
+    margin-left: 220px;
 }
 
 article.item {
     display: block;
     border-top:5px solid #EEEEEE;
-    padding-bottom:20px;
+    padding-bottom:10px;
     padding-top:10px;
 }
 
 article.item h2 {
     display:block;
-    font-size:35px;
+    font-size: 1.5em;
     letter-spacing:1px;
     text-decoration:none;
     text-transform:lowercase;
+    margin: 0.5em 16px 0.3em 0px;
 }
 
 article.item h2 a {
     color:#1C6191;
-    font-size:35px;
+    font-size: 1.5em;
     letter-spacing:1px;
     text-decoration:none;
     text-transform:lowercase;
@@ -126,7 +189,8 @@ article.item h2 a:hover {
 }
 
 article.item h2 span {
-    font-size: 60%;
+    font-size: 1.125em;
+    color: #555c58;
 }
 
 article.item p a {
@@ -138,9 +202,12 @@ article.item p a:hover {
     text-decoration:underline;
 }
 
+article.item img {
+    vertical-align:middle;
+}
 aside.sidebar {
     display: block;
-    left:-200px;
+    left: 5px;
     position:absolute;
     width:190px;
     z-index:10;
@@ -240,7 +307,24 @@ li.comment {
 table.help {
     clear: both;
     width: 100%;
+    margin-top: 5px;
+    margin: 5px;
 }
+
+.help,
+.help tr,
+.help td {
+    border: 1px solid #c0c0c0;
+    margin: 0px;
+    padding: 4px;
+    
+}
+
+.help th {
+    background-color: #ffff99;
+    text-align: center;
+}
+
 .subcomment form, #newcomment form {
     margin: 0;
 }
@@ -284,6 +368,12 @@ form ol, form ol li {
     color: #fff;
     background: #000;
 }
+
+.hidden {
+    display: none;
+}
+
+/* dialog */
 .jqmOverlay { background-color: #000; }
 
 /* Background iframe styling for IE6. Prevents ActiveX bleed-through (<select> form elements, etc.) */
