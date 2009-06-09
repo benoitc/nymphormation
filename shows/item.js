@@ -41,6 +41,7 @@ function(doc, req) {
   
   return template(tpl, {
       doc: doc,
+      jdoc: toJSON(doc),
       linkid: linkid,
       parent_url: parent_url,
       path: toJSON(path),

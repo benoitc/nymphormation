@@ -215,11 +215,20 @@ function updateChanges(app) {
           
           $("#content").html(data.rows.map(function(row) {
             var news = row.value;
-            url = parseUri(news.url)
+            
+            if (news.url)
+              domain = parseUri(news.url).domain;
+            else
+              domain = "";
+            
+            var item_url = news.url || app.showPath("item", news._id);
+
             var nb = nb_comments[news._id] || 0;
             var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
+            
+            
             return '<article class="item">'
-            + '<h2><a href="'+ news.url + '">' + news.title + '</a> <span clas="host">'+url.domain+'</span></h2>'
+            + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
             + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
             + news.author.gravatar +'?s=22&d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')+'">'
             + news.author.username + '</a></span> '
@@ -379,10 +388,11 @@ function fsubcomment(app, obj) {
 }
 
 
-function updateComments(app, linkid, docid, cache) {
+function updateComments(app, linkid, docid, doc_title) {
   var docid = docid,
   linkid = linkid,
-  app = app;
+  app = app,
+  title = doc_title;
   
   function children(parentid, rows, comments, idx_comments) {
     for(var v=0; v < rows.length; v++) {

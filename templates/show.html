@@ -51,9 +51,9 @@
 
          	<li class="footer"> 
          		<div> 
-         			<p>Software Copyright (C) 2009 Benoît Chesneau.</p> 
+         			<p>Software Copyright (C) 2009 Benoît Chesneau. Designed by</p> 
          		</div> 
-         	</li> 
+         	</li>
          </ul>
        </aside>
       
@@ -129,6 +129,9 @@
       <script>
         var linkid = "<%= linkid %>";
         var username = "<%= username %>";
+        
+        var doc = <%= jdoc %>;
+        
         $(document).ready(function() {
           $.CouchApp(function(app) {
             var app = app;
