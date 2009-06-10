@@ -369,7 +369,7 @@ function updateChanges(app) {
     startkey: ["link", {}],
     endkey: ["link"],
     descending: true,
-    limit: 15,
+    limit: 16,
     success: function(data) {
       var ids = [];
       for (var i=0; i<data.rows.length; i++) {
@@ -392,7 +392,8 @@ function updateChanges(app) {
               var points = {};
               for (var i=0; i<json.rows.length; i++)
                 points[json.rows[i].key] = json.rows[i].value;
-              
+                
+                
               $("#links").html(data.rows.map(function(row) {
                 var news = row.value;
 
@@ -406,9 +407,6 @@ function updateChanges(app) {
                 var nb = nb_comments[news._id] || 0;
                 var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
                 return '<article class="item" id="'+news._id+'">'
-                //+ '<div class="vote" id="v'+news._id+'"><img src="images/vote-arrow-up.png" alt="up" class="up">'
-                //+ '<span class="vote-count">' + points[news._id] + '</span>'
-                //+ '<img src="images/vote-arrow-down.png" alt="down" class="down"></div>'
                 + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
                 + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
                 + news.author.gravatar +'?s=22&d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')+'">'
@@ -420,6 +418,13 @@ function updateChanges(app) {
                 +  points[news._id] + ' votes</a></span></p></article>';
 
               }).join(''));
+              
+              if (data.rows.length == 16) {
+                var next = $('<div class="next"><a href="index.html?next='
+                + data.rows[data.rows.length-1].value['_id'] +'">next</a></div>');
+                $("#links").append(next);
+              }
+              
               localizeDates();
 
               $(".up").click(function(e) {

@@ -72,14 +72,16 @@ table {
 }
 
 #container {
-    padding-top:10px;
+    padding-top:8px;
     position:relative;
-    min-width:770px;
+    width:950px;
+    margin: 0 auto;
 }
 
 #logpanel {
     float: right;
-    padding-right: 10px;
+    margin-right: 10px;
+    font-size: 80%;
 }
 
 #logpanel ul {
@@ -91,7 +93,6 @@ table {
     float: left;
 }
 #logpanel ul li a {
-    font-size: 12px;
     color: #000;
     text-decoration: none;
 }
@@ -117,7 +118,7 @@ header#mainh {
     display: block;
     position:relative;
     width: 400px;
-    left: 340px;
+    left: 240px;
 }
 #mainh h1 a {
     color: #222222;
@@ -136,10 +137,15 @@ header#mainh {
     margin-right: 10px;
 }
 #mainh ul li {
-    background-color: #222222;
+    background-color: #000;
     margin-bottom: 5px;
     text-align: right;
 }
+
+#mainh ul li.active {
+    background-color: #cc0000;
+}
+
 #mainh ul li a {
     color:#EEEEEE;
     display:block;
@@ -149,8 +155,8 @@ header#mainh {
 }
 
 #mainh ul li a:hover{
-    background-color:#FFFFFF;
-    color:#1C6191;
+    background-color:#cc0000;
+    color:#EEEEEE;
 }
 
 
@@ -158,7 +164,7 @@ section#content {
 
     display: block;
     position: relative;
-    margin-left: 340px;
+    margin-left: 240px;
 }
 
 #content h1 {
@@ -168,7 +174,7 @@ section#content {
 
 article.item {
     display: block;
-    border-top:5px solid #EEEEEE;
+    border-top:5px dashed #EEEEEE;
     padding-bottom:10px;
     padding-top:10px;
     position: relative;
@@ -184,7 +190,7 @@ article.item h2 {
 }
 
 article.item h2 a {
-    color:#1C6191;
+    color:#cc0000;
     
     font-size: 1.2em;
     letter-spacing:1px;
@@ -245,40 +251,57 @@ aside.sidebar {
     display: block;
     left: 5px;
     position:absolute;
-    top: 20px;
-    width:290px;
+    width:190px;
     z-index:10;
 }
-footer#mainfooter ul.notifications li {
-    background-color:#222222;
+
+aside.sidebar h1 {
+    position: absolute;
+   top: -60px;
+}
+
+aside.sidebar h1 a {
+    color: #222222;
+    font-size: 1.4em;
+    margin-top: 20px;
+    font-weight: bold;
+    letter-spacing: -2px;
+    padding: 5px 5px 5px 0;
+    text-decoration: none;
+    text-transform: uppercase;
+    word-spacing: 5px;
+}
+
+aside.sidebar ul.notifications li {
+    background-color:#191919;
     color:#AAAAAA;
     margin-bottom:5px;
     overflow: hidden;
     padding:5px;
 }
  
-footer#mainfooter ul.notifications li div h3 {
+aside.sidebar ul.notifications li div h3 {
     color:#EEEEEE;
     margin-bottom:10px;
 }
-footer#mainfooter ul.notifications li div p {
+aside.sidebar ul.notifications li div p {
     padding-left:10px;
     padding-right:10px;
 }
-footer#mainfooter ul.notifications li div p {
+aside.sidebar ul.notifications li div p {
     font-size:13px;
     line-height:14px;
 }
-footer#mainfooter ul.notifications li div p a {
+aside.sidebar ul.notifications li div p a {
     color:#FFFFFF;
     font-weight:bold;
     text-decoration:none;
 }
-footer#mainfooter ul.notifications li div p a:hover {
+aside.sidebar ul.notifications li div p a:hover {
     text-decoration:underline;
 }
 
-footer#mainfooter ul.notifications li.footer div p {
+aside.sidebar ul.notifications li.footer div p {
     color:#EEEEEE;
     font-size:14px;
     line-height:17px;
@@ -299,35 +322,22 @@ form#fedit input[type="text"] {
     width: 243px;
     
 }
-aside.sidebar form#fedit textarea {
+#content form#fedit textarea {
     padding:5px;
     width: 98%;
     height: 190px;
 }
 
-aside.sidebar form#fedit ul {
-    padding-top: 10px;
-}
-aside.sidebar form#fedit  li {
-    margin: 0;
-    height: 18px;
-    vertical-align: middle;
-    margin-bottom: 5px;
-}
-aside.sidebar form#fedit  li * {
-    vertical-align: middle;
-}
-aside.sidebar form#fedit label {
-    display: block;
-    width: 40px;
-    float: left;
+#content #fedit {
+    width: 400px;
+    margin-top: -100px;
 }
 
 #fedit h2 {
     background-color: #444444;
     color: white;
     font-size: 28px;
-    margin-bottom: 3px;
+    margin-bottom: 20px;
     margin-right: 0px;
 }
 
@@ -340,6 +350,21 @@ form#fedit #fsubmit {
     height: 50px;
     text-transform: uppercase;
     width: 290px;
+}
+
+#fedit label {
+    display: block;
+    float: left;
+    width: 80px;
+}
+
+#fedit input[type="text"] {
+    width: 320px;
+}
+
+.form-row { 
+    clear: both;
+    padding: 0.1em 0;
 }
 
 form#fedit #fsubmit:hover {
@@ -360,7 +385,7 @@ p.tips span {
     font-weight:bold;
 }
 
-footer#mainfooter ul.notifications li {
+aside.sidebar ul.notifications li {
     background-color:#222222;
     color:#AAAAAA;
     margin-bottom:5px;
@@ -368,30 +393,30 @@ footer#mainfooter ul.notifications li {
     padding:5px;
 }
  
-footer#mainfooter ul.notifications li div p.title {
+aside.sidebar ul.notifications li div p.title {
     color:#EEEEEE;
     margin-bottom:10px;
     font-weight: bold;
     font-size: 1em;
 }
-footer#mainfooter ul.notifications li div p {
+aside.sidebar ul.notifications li div p {
     padding-left:10px;
     padding-right:10px;
 }
-footer#mainfooter ul.notifications li div p {
+aside.sidebar ul.notifications li div p {
     font-size:13px;
     line-height:14px;
 }
-footer#mainfooter ul.notifications li div p a {
+aside.sidebar ul.notifications li div p a {
     color:#FFFFFF;
     font-weight:bold;
     text-decoration:none;
 }
-footer#mainfooter ul.notifications li div p a:hover {
+aside.sidebar ul.notifications li div p a:hover {
     text-decoration:underline;
 }
 
-footer#mainfooter ul.notifications li.footer div p {
+aside.sidebar ul.notifications li.footer div p {
     color:#EEEEEE;
     font-size:14px;
     line-height:17px;
