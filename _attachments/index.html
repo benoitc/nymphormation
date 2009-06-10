@@ -41,24 +41,44 @@
       </header>
     
       <aside class="sidebar">
-        <ul class="notifications"> 
-          <li> 
+        <form name="fedit" id="fedit" method="POST" action=".">
+            <h2>Submit a link</h2>
+            <ul>
+              <li><label for="title">title</label><input type="text" name="title" id="title"></li>
+              <li><label for="url">url</label><input type="text" name="url" id="url"></li>
+             
+            </ul>
+            <p>or</p>
+            <div><textarea name="body" id="body" cols="50" rows="4"></textarea></div>
+            
+            <p class="tips"><span>*</span>leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the comments page. If there is a url, the text will be ignored.</p>
+            <input type="submit" id="fsubmit" value="submit">
+        
+        </form>
+        <footer id="mainfooter">
+          <ul class="notifications"> 
+            <li> 
         			<div> 
-                  <h3>About Nymphormation</h3> 
+                  <p class="title">About Nymphormation</p>
                   <p>Nymphormation is a <a href="http://github.com/couchapp/couchapp">Couchapp</a> that allow people to share links. You can find code on <a href="http://bitbucket.org/benoitc/nymphormation/">bitbucket</a>.</p> 
         			</div> 
-          </li> 
+            </li> 
 
-        	<li class="footer"> 
-        		<div> 
-        			<p>Software Copyright (C) 2009 Benoît Chesneau.</p> 
-        		</div> 
-        	</li> 
-        </ul>
+        	  <li class="footer"> 
+        		  <div> 
+        			  <p>Software Copyright (C) 2009 Benoît Chesneau.</p> 
+        		  </div> 
+        	  </li> 
+          </ul>
+        </footer>
       </aside>
     
-      <section id="content"></section>
+      <section id="content">
+        <h1>Latest links</h1>
+        <div id="links"></div>
+      </section>
     
+      
     </div>
       <div id="login-popup" title="" style="display: none;">
         <h2>you'll need to login or register to do that</h2>
@@ -85,7 +105,7 @@
               <li><label for="user">Username: </label><input id="user" type="text" value="" class="text ui-widget-content ui-corner-all" /></li>
               <li><label id="label-passwd" for="passwd">Password: </label><input id="passwd" type="password" maxlength="20" value="" class="text ui-widget-content ui-corner-all" /></li>
               <li><input id="loginbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="login"></li>
-            <ul> 
+            </ul> 
         </form>
       </div>
       <a href="#" class="close">close this window</a>
@@ -111,8 +131,66 @@
           $.CouchApp(function(app) {
              new userNav(app);
              newestPage(app);
+             
+            var tips = $("#validateTips");
+
+             function updateTips(t) {
+                 tips.text(t).effect("highlight", {},
+                 1500);
+             }
+
+             function checkLength(v, n, min, max) {
+                 if (v.length > max || v.length < min) {
+                     o.addClass('ui-state-error');
+                     updateTips("Length of " + n + " must be between " + min + " and " + max + ".");
+                     return false;
+                 } else {
+                     return true;
+                 }
+             }
+
+             var entryForm = app.docForm("form#fedit", {
+               fields: ["title", "url", "body"],
+               template: {
+                   type: "link"
+               },
+               validForm: function(doc) {
+                   if (!doc.title) {
+                     updateTips("Title required");
+                     return false;
+                   }
+                   checkLength(doc.title, "title", 3, 50);
+                   if (!doc.body && !doc.url) {
+                     updateTips("Text or Url are empty.");
+                     return false;
+                   }
+                   return true;
+               },
+               beforeSave: function(doc) {
+                 doc.created_at = new Date().rfc3339();
+                 var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+                 doc.author = { 
+                   username: cookie[0],
+                   gravatar: cookie[1]
+                 }
+               },
+               success: function(resp, doc) {
+                 var vote = {
+                   itemid: doc._id,
+                   d: doc.created_at,
+                   v: 1,
+                   author: doc.author,
+                   type: "vote",
+                 }
+                 app.db.saveDoc(vote, {
+                   success: function() {
+                     document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+                   }
+                 });
+              }
+            });
           });
-        })
+        });
       </script>
     
   </body>

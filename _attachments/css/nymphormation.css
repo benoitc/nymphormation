@@ -109,6 +109,7 @@ header#mainh {
     display: block;
     height: 140px;
     clear: both;
+    
 }
 
 
@@ -116,7 +117,7 @@ header#mainh {
     display: block;
     position:relative;
     width: 400px;
-    left: 220px;
+    left: 340px;
 }
 #mainh h1 a {
     color: #222222;
@@ -157,7 +158,12 @@ section#content {
 
     display: block;
     position: relative;
-    margin-left: 220px;
+    margin-left: 340px;
+}
+
+#content h1 {
+    font-size: 2em;
+    font-weight: bold;
 }
 
 article.item {
@@ -165,21 +171,22 @@ article.item {
     border-top:5px solid #EEEEEE;
     padding-bottom:10px;
     padding-top:10px;
-    width: 98%;
+    position: relative;
 }
 
 article.item h2 {
     display:block;
-    font-size: 1.5em;
+    font-size: 1.2em;
     letter-spacing:1px;
     text-decoration:none;
     text-transform:lowercase;
-    margin: 0.5em 16px 0.3em 0px;
+    margin: 0em 16px 0.5em 0px;
 }
 
 article.item h2 a {
     color:#1C6191;
-    font-size: 1.5em;
+    
+    font-size: 1.2em;
     letter-spacing:1px;
     text-decoration:none;
     text-transform:lowercase;
@@ -206,14 +213,43 @@ article.item p a:hover {
 article.item img {
     vertical-align:middle;
 }
+
+
+.item span.nbcomments {
+    background: #666;
+    padding: 0.3em;
+    vertical-align: top;
+}
+
+.item span.nbcomments:hover {
+    background:#000;
+}
+.item span.nbvotes {
+    background: #666;
+    padding: 0.1em;
+    vertical-align: top;
+}
+
+
+
+.item .nbcomments a,
+.item .nbcomments a:hover,
+.item .nbvotes a,
+.item .nbvotes a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+
 aside.sidebar {
     display: block;
     left: 5px;
     position:absolute;
-    width:190px;
+    top: 20px;
+    width:290px;
     z-index:10;
 }
-aside.sidebar ul li {
+footer#mainfooter ul.notifications li {
     background-color:#222222;
     color:#AAAAAA;
     margin-bottom:5px;
@@ -221,28 +257,141 @@ aside.sidebar ul li {
     padding:5px;
 }
  
-aside.sidebar li div h3 {
+footer#mainfooter ul.notifications li div h3 {
     color:#EEEEEE;
     margin-bottom:10px;
 }
-aside.sidebar li div p {
+footer#mainfooter ul.notifications li div p {
     padding-left:10px;
     padding-right:10px;
 }
-aside.sidebar li div p {
+footer#mainfooter ul.notifications li div p {
     font-size:13px;
     line-height:14px;
 }
-aside.sidebar li div p a {
+footer#mainfooter ul.notifications li div p a {
     color:#FFFFFF;
     font-weight:bold;
     text-decoration:none;
 }
-aside.sidebar li div p a:hover {
+footer#mainfooter ul.notifications li div p a:hover {
     text-decoration:underline;
 }
 
-aside.sidebar li.footer div p {
+footer#mainfooter ul.notifications li.footer div p {
+    color:#EEEEEE;
+    font-size:14px;
+    line-height:17px;
+}
+
+aside.sidebar form#fedit {
+    margin-bottom: 60px;
+}
+
+form#fedit input[type="text"],
+form#fedit textarea {
+    background: #111111;
+    color: #EEEEEE;
+}
+
+form#fedit input[type="text"] {
+    height: 18px;
+    width: 243px;
+    
+}
+aside.sidebar form#fedit textarea {
+    padding:5px;
+    width: 98%;
+    height: 190px;
+}
+
+aside.sidebar form#fedit ul {
+    padding-top: 10px;
+}
+aside.sidebar form#fedit  li {
+    margin: 0;
+    height: 18px;
+    vertical-align: middle;
+    margin-bottom: 5px;
+}
+aside.sidebar form#fedit  li * {
+    vertical-align: middle;
+}
+aside.sidebar form#fedit label {
+    display: block;
+    width: 40px;
+    float: left;
+}
+
+#fedit h2 {
+    background-color: #444444;
+    color: white;
+    font-size: 28px;
+    margin-bottom: 3px;
+    margin-right: 0px;
+}
+
+form#fedit #fsubmit {
+    background-color: #111111;
+    border: 0px;
+    color: #eeeeee;
+    font-size: 36px;
+    font-weight: bold;
+    height: 50px;
+    text-transform: uppercase;
+    width: 290px;
+}
+
+form#fedit #fsubmit:hover {
+    background-color: #222222;
+    color: #eeeeee;
+}
+
+p.tips {
+	padding-top: 15px;
+	padding-bottom: 15px;
+	text-transform: uppercase;
+	font-size: 13px;
+	line-height: 18px;
+}
+
+p.tips span {
+    font-size:30px;
+    font-weight:bold;
+}
+
+footer#mainfooter ul.notifications li {
+    background-color:#222222;
+    color:#AAAAAA;
+    margin-bottom:5px;
+    overflow: hidden;
+    padding:5px;
+}
+ 
+footer#mainfooter ul.notifications li div p.title {
+    color:#EEEEEE;
+    margin-bottom:10px;
+    font-weight: bold;
+    font-size: 1em;
+}
+footer#mainfooter ul.notifications li div p {
+    padding-left:10px;
+    padding-right:10px;
+}
+footer#mainfooter ul.notifications li div p {
+    font-size:13px;
+    line-height:14px;
+}
+footer#mainfooter ul.notifications li div p a {
+    color:#FFFFFF;
+    font-weight:bold;
+    text-decoration:none;
+}
+footer#mainfooter ul.notifications li div p a:hover {
+    text-decoration:underline;
+}
+
+footer#mainfooter ul.notifications li.footer div p {
     color:#EEEEEE;
     font-size:14px;
     line-height:17px;
@@ -294,7 +443,7 @@ li.comment {
     width: 450px;
     margin-bottom: 5px;
 }
-.subcomment textarea, #newcomment textarea {
+.subcomment textarea {
     width: 450px;
     height: 70px;
 }
@@ -330,9 +479,65 @@ table.help {
     margin: 0;
 }
 
-.vote {
-    float:right;
+.item .votes {
+    position: absolute;
+    top: 20%;
+    background: #666;
+    right: 75px;
+    height: 38px;
+    margin: 0px 3px 0px 0px;
+    padding: 5px;
+    width: 38px;
+    text-align: center;
     z-index: 99;
+    color: #fff;
+    font-size: 90%;
+    
+}
+
+.item .status {
+    position: absolute;
+    background: #666;
+    top: 20%;
+    right: 10px;
+    height: 38px;
+    margin: 0px 3px 0px 0px;
+    padding: 5px;
+    width: 54px;
+    z-index: 100;
+    text-align: center;
+    color: #eee;
+    font-size: 90%;
+}
+
+.mini-count {
+    font-weight: bold;
+    height: 25px;
+    vertical-align: middle;
+}
+
+.mini-count a {
+    color: #eee;
+    text-decoration: none;
+}
+.item .vote {
+    position: absolute;
+    right: 10px;
+    z-index: 99;
+    width: 100px;
+    font-size: 1em;
+    top: 20%;
+    text-align: center;
+}
+
+.vote span {
+    color: #808185;
+    display: block;
+    font-weight: bold;
+    
+}
+.vote-count {
+    
 }
 
 .up,

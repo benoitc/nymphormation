@@ -10,7 +10,7 @@ function(head, row, req, row_info) {
    html: function() {
      if (head) {
        return template(templates.comments.head, {
-         req: toJSON(req)
+         username: req.userCtx['name']
        });
      } else if (row) {
        var fcreated_at = new Date().setRFC3339(row.value.created_at).toLocaleString();
@@ -21,7 +21,9 @@ function(head, row, req, row_info) {
          parent_url: showPath("item", row.value.parentid)
        });
      } else {
-       return template(templates.comments.tail, {});
+       return template(templates.comments.tail, {
+         username: req.userCtx['name']
+       });
      }
    }
    
