@@ -359,13 +359,14 @@ function updateChanges(app) {
   }
   
   var next = query["next"] || false;
-  
-  
+  startkey = ["link", {}];
+  if (next)
+    startkey = [next, {}]
   
   app.view("news",{
     reduce: false,
-    startkey: ["link", {}],
-    endkey: ["link"],
+    startkey: startkey,
+    endkey: [],
     descending: true,
     limit: 16,
     success: function(data) {

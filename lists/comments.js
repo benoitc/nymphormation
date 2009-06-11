@@ -4,6 +4,7 @@ function(head, row, req, row_info) {
  // !code helpers/template.js
  // !code vendor/couchapp/path.js
  // !code vendor/couchapp/date.js
+ // !code vendor/couchapp/json2.js
  
  var feedPath = listPath('comments','comments',{descending:true, limit:25, format:"atom"});
  var feedLinksPath = listPath('links','news',{descending:true, limit:25, reduce:false, format:"atom"});
@@ -20,6 +21,7 @@ function(head, row, req, row_info) {
        return template(templates.comments.row, {
          doc: row.value,
          fcreated_at: fcreated_at,
+         author: toJSON(row.value.author.username),
          link_url: showPath("item", row.value._id),
          parent_url: showPath("item", row.value.parentid)
        });

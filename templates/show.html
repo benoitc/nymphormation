@@ -65,7 +65,7 @@
               <% if (doc.title) { %>
               <h2><div class="vote"><span class="vote-count"></span><img src="../../images/vote-arrow-up-on.png" alt="up" class="up" id="u<%= doc._id %>"></div><a href="<%= doc.url %>"><%= doc.title %></a> <span class="host"><%= doc.domain %></span></h2>
               <% } %>
-              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="../item/<%= doc._id %>">link</a><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %><% if (!doc.title) { %><span class="link">on <%= link_title %></span><% }%></p>
+              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <a href='../../_list/user/links?key="<%= doc.author.username %>"'><%= doc.author.username %></a> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="../item/<%= doc._id %>">link</a><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %><% if (!doc.title) { %><span class="link">on <%= link_title %></span><% }%></p>
             </header>
               <% if (doc.body) { %>
               <div class="text"><%= doc.html %></div>

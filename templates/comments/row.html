@@ -1,4 +1,4 @@
 <article id="<%= doc._id %>" class="comment">
-  <p class="meta">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""><%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="<%= link_url %>">link</a> | <a href="<%= parent_url %>">parent</a><span class="link"> | on <a href=""><%= doc.link_title %></a></span></p>
+  <p class="meta">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""><a href='../user/links?key="<%= doc.author.username %>"'><%= doc.author.username %></a> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="<%= link_url %>">link</a> | <a href="<%= parent_url %>">parent</a><span class="link"> | on <a href=""><%= doc.link_title %></a></span></p>
   <div class="text"><%= doc.html %></div>
 </article>

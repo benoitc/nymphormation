@@ -1,5 +1,5 @@
 function(doc) {
   if (doc.type == "link") {
-    emit([doc.type, doc._local_seq], doc);
+    emit([doc._id, doc._local_seq], doc);
   }
 };
