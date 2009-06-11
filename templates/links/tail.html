@@ -50,6 +50,7 @@
        <!-- end script tzgd -->
       
       <script>
+        var first_key = <%= first_key %>;
         $(document).ready(function() {
           var created = Date.now();
           $.CouchApp(function(app) {
@@ -88,7 +89,7 @@
                 }
               }
             });
-            
+
             newestPage(app);
             
           });

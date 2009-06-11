@@ -184,7 +184,7 @@
                 }
                 app.db.saveDoc(vote, {
                   success: function() {
-                    document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+                    document.location =  app.listPath("links", "news") + "?limit=11&descending=true";
                   }
                 });
                 

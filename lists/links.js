@@ -43,7 +43,8 @@ function(head, row, req, row_info) {
           }
          return template(templates.links.tail, {
            username: req.userCtx.name,
-           next:next
+           next:next,
+           first_key: toJSON(row_info.first_key)
          });
        }
      },

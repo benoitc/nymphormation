@@ -369,42 +369,48 @@ function updateChanges(app) {
     descending: true,
     limit: 11,
     success: function(data) {
+      link_update = true
+      if (first_key[0] == data.rows[0].key[0] && first_key[1] == data.rows[0].key[1])
+        link_update = false;
       var ids = [];
-      
-      $("#links").html(data.rows.map(function(row, idx) {
-        if (idx == 10)
-         return ''
-        var news = row.value;
-        ids.push(row.value['_id']);
-        if (news.url)
-          domain = parseUri(news.url).domain;
-        else
-          domain = "";
+      if (!link_update)
+        for (var i=0; i<data.rows.length; i++)
+          ids.push(data.rows[i].value['_id']);
+      else {
+        $("#links").html(data.rows.map(function(row, idx) {
+          if (idx == 10)
+           return ''
+          var news = row.value;
+          ids.push(row.value['_id']);
+          if (news.url)
+            domain = parseUri(news.url).domain;
+          else
+            domain = "";
 
-        var item_url = news.url || app.showPath("item", news._id);
+          var item_url = news.url || app.showPath("item", news._id);
 
-        var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
-        return '<article class="item" id="'+news._id+'">'
-        + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
-        + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
-        + news.author.gravatar +'?s=22&amp;d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')
-        +'?key='+encodeURIComponent(JSON.stringify(news.author.username))+'">'
-        + news.author.username + '</a></span> '
-        + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
-        + ' <span class="nbcomments"><a href="' + app.showPath("item", news._id) +'">0 comments</a></span>'
-        + ' <span class="nbvotes"><a href="' + app.showPath("item", news._id) +'">0 votes</a></span></p></article>';
+          var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
+          return '<article class="item" id="'+news._id+'">'
+          + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
+          + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
+          + news.author.gravatar +'?s=22&amp;d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')
+          +'?key='+encodeURIComponent(JSON.stringify(news.author.username))+'">'
+          + news.author.username + '</a></span> '
+          + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
+          + ' <span class="nbcomments"><a href="' + app.showPath("item", news._id) +'">0 comments</a></span>'
+          + ' <span class="nbvotes"><a href="' + app.showPath("item", news._id) +'">0 votes</a></span></p></article>';
 
-      }).join(''));
-      
-      if (data.rows.length == 11) {
-        var params_string = "?next=" + encodeURIComponent(toJSON(data.rows[data.rows.length-1].key));
-        var next = $('<div class="next"><a href="'+ app.listPath("links", "news")
-        + encodeOptions({key: data.rows[data.rows.length-1].key, descending: true, limit: 11 }) +'">next</a></div>');
-        $("#links").append(next);
+        }).join(''));
+
+        if (data.rows.length == 11) {
+          var params_string = "?next=" + encodeURIComponent(toJSON(data.rows[data.rows.length-1].key));
+          var next = $('<div class="next"><a href="'+ app.listPath("links", "news")
+          + encodeOptions({key: data.rows[data.rows.length-1].key, descending: true, limit: 11 }) +'">next</a></div>');
+          $("#links").append(next);
+        }
+        localizeDates();
       }
-      
-      localizeDates();
-      
+          
       app.view("nbcomments", {
         keys: ids,
         group: true,
@@ -431,7 +437,7 @@ function updateChanges(app) {
             $("#"+json.rows[c].key+" p span.nbvotes").html(value);
           }
         }
-      })
+      });
       
       
       
