@@ -138,6 +138,28 @@ Math.uuidInt = function() {
   return parseInt(Math.uuidHex(), 16);
 };
 
+
+// Convert a options object to an url query string.
+// ex: {key:'value',key2:'value2'} becomes '?key="value"&key2="value2"'
+function encodeOptions(options) {
+  var buf = []
+  if (typeof(options) == "object" && options !== null) {
+    for (var name in options) {
+      if (name == "error" || name == "success") continue;
+      var value = options[name];
+      if (name == "key" || name == "startkey" || name == "endkey" || name == "keys") {
+        value = toJSON(value);
+      }
+      buf.push(encodeURIComponent(name) + "=" + encodeURIComponent(value));
+    }
+  }
+  return buf.length ? "?" + buf.join("&") : "";
+}
+
+function toJSON(obj) {
+  return obj !== null ? JSON.stringify(obj) : null;
+}
+
 (function($) {
 
   function Design(db, name) {

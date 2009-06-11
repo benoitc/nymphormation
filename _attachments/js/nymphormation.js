@@ -359,10 +359,11 @@ function updateChanges(app) {
   }
   
   var next = query["next"] || false;
-  startkey = ["link", {}];
+  startkey = [{}, {}];
   if (next)
-    startkey = [next, {}]
+    startkey = JSON.parse(decodeURI(next).replace("%2C", ","));
   
+  console.log(startkey)
   app.view("news",{
     reduce: false,
     startkey: startkey,
@@ -420,8 +421,9 @@ function updateChanges(app) {
               }).join(''));
               
               if (data.rows.length == 11) {
-                var next = $('<div class="next"><a href="index.html?next='
-                + data.rows[data.rows.length-1].value['_id'] +'">next</a></div>');
+                var params_string = "?next=" + encodeURIComponent(toJSON(data.rows[data.rows.length-1].key));
+                var next = $('<div class="next"><a href="index.html'
+                + params_string +'">next</a></div>');
                 $("#links").append(next);
               }
               
