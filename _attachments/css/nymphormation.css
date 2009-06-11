@@ -172,6 +172,15 @@ section#content {
     font-weight: bold;
 }
 
+article#entry {
+    display: block;
+    border-bottom:5px dashed #EEEEEE;
+    padding-bottom:10px;
+    padding-top:10px;
+    clear: both;
+    position: relative;
+}
+
 article.item {
     display: block;
     border-top:5px dashed #EEEEEE;
@@ -180,7 +189,8 @@ article.item {
     position: relative;
 }
 
-article.item h2 {
+article.item h2,
+#entry h2 {
     display:block;
     font-size: 1.2em;
     letter-spacing:1px;
@@ -189,7 +199,8 @@ article.item h2 {
     margin: 0em 16px 0.5em 0px;
 }
 
-article.item h2 a {
+article.item h2 a,
+#entry h2 a {
     color:#cc0000;
     
     font-size: 1.2em;
@@ -197,7 +208,8 @@ article.item h2 a {
     text-decoration:none;
     text-transform:lowercase;
 }
-article.item h2 a:hover {
+article.item h2 a:hover,
+#entry h2 a:hover {
     background-color:#222222;
     color:#EEEEEE;
 }
@@ -207,16 +219,19 @@ article.item h2 span {
     color: #555c58;
 }
 
-article.item p a {
+article.item p a,
+li.comment a {
     color:#000000;
     font-weight:bold;
     text-decoration:none;
 }
-article.item p a:hover {
+article.item p a:hover,
+li.comment a:hover {
     text-decoration:underline;
 }
 
-article.item img {
+article.item img,
+li.comment img {
     vertical-align:middle;
 }
 
@@ -422,6 +437,7 @@ aside.sidebar ul.notifications li.footer div p {
     line-height:17px;
 }
 
+
 .loginform {
     float: left;
     padding-left: 15px;
@@ -463,6 +479,37 @@ li ul {
 li.comment {
     margin-bottom: 7px;
     clear: both;
+}
+
+li.comment p.meta {
+    border-bottom:2px dashed #EEEEEE;
+    padding-bottom:5px;
+}
+
+li.comment div.text {
+    padding: 0.3em 0 0.3em 0;
+}
+li.comment p.bottom {
+    border-top:2px dashed #EEEEEE;
+    margin-bottom:5px;
+    background-color: #f2f2f1;
+    
+    -moz-border-radius: 4px; -webkit-border-radius: 4px; 
+    padding: 0.3em;
+}
+
+#comments ul {
+     border-left:2px dashed #EEEEEE;
+     
+}
+#comments ul li {
+    margin-left: 10px;
+}
+
+.cform {
+    display: block;
+    padding: 0.3em;
+    margin-bottom: 5px;
 }
 .subcomment, #newcomment {
     width: 450px;

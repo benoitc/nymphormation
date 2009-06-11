@@ -63,10 +63,10 @@
               <% if (doc.title) { %>
               <h2><a href="<%= doc.url %>"><%= doc.title %></a></h2>
               <% } %>
-              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %></p>
-            
+              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %></p>
+            </header>
               <% if (doc.body) { %>
-              <p><%= doc.body %></p>
+              <div><%= doc.body %></div>
               <% } %>
             
             <p id="validateTips"></p>
@@ -107,7 +107,7 @@
             <li><label for="user">Username: </label><input id="user" type="text" value="" class="text ui-widget-content ui-corner-all" /></li>
             <li><label id="label-passwd" for="passwd">Password: </label><input id="passwd" type="password" maxlength="20" value="" class="text ui-widget-content ui-corner-all" /></li>
             <li><input id="loginbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="login"></li>
-          <ul> 
+          </ul> 
       </form>
     </div>
     <a href="#" class="close">close this window</a>

@@ -327,7 +327,21 @@ function parseUri(sourceUri){
 
 
 function updateChanges(app) {
+  
   var app = app;
+  
+  var href = document.location.href;
+  var uri = parseUri(document.location.href);
+  var query = {};
+  if (uri.query) {
+    query_parts = uri.query.split("&");
+    for (var i=0; i<query_parts.length; i++) {
+      p = query_parts[i].split("=");
+      query[p[0]] = p[1] || "";
+    }
+  }
+  
+  var next = query["next"] || false;
   
   function vote(obj, value) {
     var obj=obj,
@@ -409,7 +423,7 @@ function updateChanges(app) {
                 return '<article class="item" id="'+news._id+'">'
                 + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
                 + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
-                + news.author.gravatar +'?s=22&d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')+'">'
+                + news.author.gravatar +'?s=22&amp;d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')+'">'
                 + news.author.username + '</a></span> '
                 + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
                 + ' <span class="nbcomments"><a href="' + app.showPath("item", news._id) +'">'
@@ -559,13 +573,15 @@ function fsubcomment(app, obj) {
     var self = obj;
     var link_id = $(self).attr('id');
     var ids= link_id.split("_");
-    cform = $('<form id=""></form');
+    cform = $('<form id="" class="cform"></form');
     $(cform).append('<input type="hidden" name="linkid" value="'+ ids[1] +'">'
     + '<input type="hidden" name="parentid" value="'+ ids[0] + '">'
     + '<textarea name="body" class="scomment"></textarea>');
     rsubmit=$('<div class="submit-row"></div>')
-    bsubmit = $('<input type="submit" name="bsubmit" value="comment">');
-    bcancel = $('<input type="reset" name="bcancel" value="cancel">');
+    bsubmit = $('<input type="submit" name="bsubmit" value="comment"'
+    +'class="nf-button ui-state-default ui-corner-all">');
+    bcancel = $('<input type="reset" name="bcancel" value="cancel"'
+    +'class="nf-button ui-state-default ui-corner-all">');
     bcancel.click(function() {
         $(self).next().remove();
     });
@@ -646,6 +662,7 @@ function updateComments(app, linkid, docid, doc_title) {
       iter_comments(comments, idx, start+1);
   }
   
+  
   function dthread(thread, level) {
     if (level == undefined)
       level = 0;
@@ -654,12 +671,15 @@ function updateComments(app, linkid, docid, doc_title) {
       var c = thread[i];
       var fcreated_at = new Date().setRFC3339(c.created_at).toLocaleString();
       ret += '<li class="comment" id="'+c._id + '">'
-      + '<p class="meta">by <a href="#">'+ c.author.username + '</a> '
+      + '<p class="meta">by <img src="http://www.gravatar.com/avatar/'
+      + c.author.gravatar +'?s=22&amp;d=identicon" alt=""><a href="'
+      + app.listPath('user', 'links')+'?key='+c.author.username+'">'
+      + c.author.username + '</a> '
       + '<time title="GMT" datetime="' + c.created_at + '" class="caps">'
       + fcreated_at + '</time></p>'
       + '<div class="text">' + c.body + '</div>';
       
-      ret += '<p><a href="'+ app.showPath("item", c._id) + '">link</a>'
+      ret += '<p class="bottom"><a href="'+ app.showPath("item", c._id) + '">link</a>'
       if (level < 5 )
         ret += ' | <a id="'+c._id + '_'+ linkid + '" href="#" class="reply">reply</a>';
       ret += '</p>'
@@ -681,6 +701,7 @@ function updateComments(app, linkid, docid, doc_title) {
         children(docid, json.rows, comments, idx_comments);
         iter_comments(comments, idx_comments);
         $("#comments").html(dthread(comments));
+        localizeDates();
       }
       $(".reply").click(function(e) {
         if ($(this).next().is('.subcomment'))
