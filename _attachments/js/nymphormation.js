@@ -363,7 +363,6 @@ function updateChanges(app) {
   if (next)
     startkey = JSON.parse(decodeURI(next).replace("%2C", ","));
   
-  console.log(startkey)
   app.view("news",{
     reduce: false,
     startkey: startkey,
@@ -372,66 +371,69 @@ function updateChanges(app) {
     limit: 11,
     success: function(data) {
       var ids = [];
-      for (var i=0; i<data.rows.length; i++) {
-        ids.push(data.rows[i].value['_id']);
+      
+      $("#links").html(data.rows.map(function(row) {
+        var news = row.value;
+        ids.push(row.value['_id']);
+        if (news.url)
+          domain = parseUri(news.url).domain;
+        else
+          domain = "";
+
+        var item_url = news.url || app.showPath("item", news._id);
+
+        var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
+        return '<article class="item" id="'+news._id+'">'
+        + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
+        + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
+        + news.author.gravatar +'?s=22&amp;d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')
+        +'?key='+encodeURIComponent(JSON.stringify(news.author.username))+'">'
+        + news.author.username + '</a></span> '
+        + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
+        + ' <span class="nbcomments"><a href="' + app.showPath("item", news._id) +'">0 comments</a></span>'
+        + ' <span class="nbvotes"><a href="' + app.showPath("item", news._id) +'">0 votes</a></span></p></article>';
+
+      }).join(''));
+      
+      if (data.rows.length == 11) {
+        var params_string = "?next=" + encodeURIComponent(toJSON(data.rows[data.rows.length-1].key));
+        var next = $('<div class="next"><a href="index.html'
+        + params_string +'">next</a></div>');
+        $("#links").append(next);
       }
+      
+      localizeDates();
       
       app.view("nbcomments", {
         keys: ids,
         group: true,
         success: function(json) {
-          var nb_comments = {};
-          for (var i=0; i<json.rows.length; i++) {
-            row = json.rows[i];
-            nb_comments[row.key] = row.value;
+          for(var c=0; c<json.rows.length; c++) {
+            value = json.rows[c].value + " comment";
+            if (json.rows[c].value > 1)
+              value +="s";
+            value = '<a href="../../_show/item/'+ json.rows[c].key +'">'+value+'</a>'
+            $("#"+json.rows[c].key+" p span.nbcomments").html(value);
           }
-          app.view("points", {
-            keys: ids,
-            group: true,
-            success: function(json) {
-              var points = {};
-              for (var i=0; i<json.rows.length; i++)
-                points[json.rows[i].key] = json.rows[i].value;
-                
-                
-              $("#links").html(data.rows.map(function(row) {
-                var news = row.value;
-
-                if (news.url)
-                  domain = parseUri(news.url).domain;
-                else
-                  domain = "";
-
-                var item_url = news.url || app.showPath("item", news._id);
-
-                var nb = nb_comments[news._id] || 0;
-                var fcreated_at = new Date().setRFC3339(news.created_at).toLocaleString();
-                return '<article class="item" id="'+news._id+'">'
-                + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
-                + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
-                + news.author.gravatar +'?s=22&amp;d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')
-                +'?key='+encodeURIComponent(JSON.stringify(news.author.username))+'">'
-                + news.author.username + '</a></span> '
-                + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
-                + ' <span class="nbcomments"><a href="' + app.showPath("item", news._id) +'">'
-                + nb + ' comments</a></span>'
-                + ' <span class="nbvotes"><a href="' + app.showPath("item", news._id) +'">'
-                +  points[news._id] + ' votes</a></span></p></article>';
-
-              }).join(''));
-              
-              if (data.rows.length == 11) {
-                var params_string = "?next=" + encodeURIComponent(toJSON(data.rows[data.rows.length-1].key));
-                var next = $('<div class="next"><a href="index.html'
-                + params_string +'">next</a></div>');
-                $("#links").append(next);
-              }
-              
-              localizeDates();
-            }
-          }) 
         }
-      });  
+      });
+      
+      app.view("points", {
+        keys: ids,
+        group: true,
+        success: function(json) {
+          for(var c=0; c<json.rows.length; c++) {
+            value = json.rows[c].value + " vote";
+            if (json.rows[c].value > 1)
+              value +="s"
+            value = '<a href="../../_show/item/'+ json.rows[c].key +'">'+value+'</a>'
+            $("#"+json.rows[c].key+" p span.nbvotes").html(value);
+          }
+        }
+      })
+      
+      
+      
     }
   });
 }
