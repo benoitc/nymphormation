@@ -368,7 +368,7 @@ function updateChanges(app) {
     startkey: startkey,
     endkey: [],
     descending: true,
-    limit: 16,
+    limit: 11,
     success: function(data) {
       var ids = [];
       for (var i=0; i<data.rows.length; i++) {
@@ -419,7 +419,7 @@ function updateChanges(app) {
 
               }).join(''));
               
-              if (data.rows.length == 16) {
+              if (data.rows.length == 11) {
                 var next = $('<div class="next"><a href="index.html?next='
                 + data.rows[data.rows.length-1].value['_id'] +'">next</a></div>');
                 $("#links").append(next);

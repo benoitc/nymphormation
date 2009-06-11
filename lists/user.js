@@ -22,7 +22,8 @@ function(head, row, req, row_info) {
           feedPath: feedPath
         });
       } else if (row) {
-        var item_url = row.value.url || app.showPath("item", row.id);
+
+        var item_url = row.value.url || showPath("item", row.id);
         var fcreated_at = new Date().setRFC3339(row.value.created_at).toLocaleString();
         if (row.value['url'])
           row.value['domain'] =  parseUri(row.value['url']).domain;

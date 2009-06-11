@@ -661,6 +661,27 @@ form ol, form ol li {
     display: none;
 }
 
+div.next {
+    display: block;
+    border: 1px solid #000;
+    padding: 0.1em;
+    width: 30px;
+    font-size: 0.9em;
+}
+
+div.next a {
+    color: #000;
+    text-decoration: none;
+}
+
+div.next:hover {
+    background-color: #000;
+}
+
+div.next:hover a {
+    color: #fff;
+}
+
 /* dialog */
 .jqmOverlay { background-color: #000; }
 

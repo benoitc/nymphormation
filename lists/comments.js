@@ -17,6 +17,9 @@ function(head, row, req, row_info) {
          feedPath: feedPath
        });
      } else if (row) {
+       if (row_info.row_number == 24 || row_info.row_number == 124)
+           return {stop: true}
+
        var fcreated_at = new Date().setRFC3339(row.value.created_at).toLocaleString();
        return template(templates.comments.row, {
          doc: row.value,
@@ -26,8 +29,18 @@ function(head, row, req, row_info) {
          parent_url: showPath("item", row.value.parentid)
        });
      } else {
+       if (row_info.row_number == 25) {
+         next = listPath('comments','comments', {
+            descending:true, 
+            limit:26,
+            startkey: row_info.prev_key
+          })
+       } else {
+         next = false;
+       }
        return template(templates.comments.tail, {
-         username: req.userCtx['name']
+         username: req.userCtx['name'],
+         next: next
        });
      }
    },
