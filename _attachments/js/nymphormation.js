@@ -193,6 +193,14 @@ function localizeDates() {
 
 }
 
+function escapeHTML(st) {                                       
+  return(                                                                 
+    st && st.replace(/&/g,'&amp;').                                         
+      replace(/>/g,'&gt;').                                           
+      replace(/</g,'&lt;').                                           
+      replace(/"/g,'&quot;')                                         
+  );                                                                     
+};
 
 // manage login. ask to register if needed
 function Login(app, options) {
@@ -530,6 +538,8 @@ function submitComment(app, form) {
   var href = document.location;
   var app = app;
    
+  var converter = new Showdown.converter;
+  
   var localFormDoc = {
     type: "comment",
   }
@@ -539,7 +549,9 @@ function submitComment(app, form) {
     alert("Comment required");
     return false;
   }
-
+  
+  localFormDoc.html = converter.makeHtml(escapeHTML(localFormDoc.body));
+  
   localFormDoc.created_at = new Date().rfc3339();
   if (!localFormDoc.parentid) {
     localFormDoc.parentid = null;
@@ -677,7 +689,7 @@ function updateComments(app, linkid, docid, doc_title) {
       + c.author.username + '</a> '
       + '<time title="GMT" datetime="' + c.created_at + '" class="caps">'
       + fcreated_at + '</time></p>'
-      + '<div class="text">' + c.body + '</div>';
+      + '<div class="text">' + c.html + '</div>';
       
       ret += '<p class="bottom"><a href="'+ app.showPath("item", c._id) + '">link</a>'
       if (level < 5 )

@@ -114,6 +114,7 @@
        <script src="../vendor/couchapp/md5.js"></script>
        <script src="../vendor/couchapp/jquery.couchapp.js?0.3"></script>
        <script src="../js/pure.js"></script>
+       <script src="../js/showdown.js"></script>
        <script src="../js/nymphormation.js"></script>
        <!-- end script tzgd -->
       
@@ -139,6 +140,8 @@
                     return true;
                 }
             }
+            
+            var converter = new Showdown.converter;
 
             var entryForm = app.docForm("form#fedit", {
               fields: ["title", "url", "body"],
@@ -164,12 +167,15 @@
                   username: cookie[0],
                   gravatar: cookie[1]
                 }
+                if (doc.body) {
+                  doc.html = converter.makeHtml(escapeHTML(doc.body));
+                }
               },
               success: function(resp, doc) {
                 var vote = {
                   itemid: doc._id,
                   d: doc.created_at,
-                  v: 1,
+                  v: 0,
                   author: doc.author,
                   type: "vote",
                 }
@@ -177,7 +183,7 @@
                   success: function() {
                     document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
                   }
-                })
+                });
                 
               }
             });

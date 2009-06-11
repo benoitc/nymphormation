@@ -68,7 +68,7 @@
               <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="../item/<%= doc._id %>">link</a><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %><% if (!doc.title) { %><span class="link">on </span><% }%></p>
             </header>
               <% if (doc.body) { %>
-              <div class="text"><%= doc.body %></div>
+              <div class="text"><%= doc.html %></div>
               <% } %>
             
             <p id="validateTips"></p>
@@ -124,6 +124,7 @@
       <script src="../../vendor/couchapp/sha1.js"></script>
       <script src="../../vendor/couchapp/md5.js"></script>
       <script src="../../vendor/couchapp/jquery.couchapp.js?0.3"></script>
+      <script src="../../js/showdown.js"></script>
       <script src="../../js/pure.js"></script>
       <script src="../../js/nymphormation.js"></script>
       <!-- end script tzgd -->

@@ -513,6 +513,18 @@ li.comment p.meta {
 li.comment div.text {
     padding: 0.3em 0 0.3em 0;
 }
+li.comment div.text a {
+    font-weight: normal;
+    color: #555c58;
+    text-decoration: none;
+}
+
+li.comment div.text a:hover {
+    background-color: #666;
+    color: #fff;
+    text-decoration: none;
+}
+
 li.comment p.bottom {
     border-top:2px dashed #EEEEEE;
     margin-bottom:5px;
