@@ -594,71 +594,27 @@ table.help {
     margin: 0;
 }
 
-.item .votes {
-    position: absolute;
-    top: 20%;
-    background: #666;
-    right: 75px;
-    height: 38px;
-    margin: 0px 3px 0px 0px;
-    padding: 5px;
-    width: 38px;
-    text-align: center;
-    z-index: 99;
-    color: #fff;
-    font-size: 90%;
-    
-}
 
-.item .status {
-    position: absolute;
-    background: #666;
-    top: 20%;
-    right: 10px;
-    height: 38px;
-    margin: 0px 3px 0px 0px;
-    padding: 5px;
-    width: 54px;
-    z-index: 100;
-    text-align: center;
-    color: #eee;
-    font-size: 90%;
-}
-
-.mini-count {
-    font-weight: bold;
-    height: 25px;
-    vertical-align: middle;
-}
-
-.mini-count a {
-    color: #eee;
-    text-decoration: none;
-}
-.item .vote {
-    position: absolute;
-    right: 10px;
-    z-index: 99;
-    width: 100px;
-    font-size: 1em;
-    top: 20%;
-    text-align: center;
-}
-
-.vote span {
-    color: #808185;
+#entry header h2 div.vote {
     display: block;
-    font-weight: bold;
+    /*position: absolute;
+    top: 0;
+    right: 0;*/
+    float: right;
+    width: 150px;
+    height: 30px;
     
+    line-height: 30px;
 }
-.vote-count {
-    
+#entry header h2 div.vote span {
+    vertical-align: top;
 }
 
-.up,
-.down {
+#entry header h2 div.vote img {
+    vertical-align: baseline;
     cursor: pointer;
 }
+
 form ol, form ol li {
     text-indent: 0;
     margin: 0;

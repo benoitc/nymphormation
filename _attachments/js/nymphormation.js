@@ -351,40 +351,7 @@ function updateChanges(app) {
   
   var next = query["next"] || false;
   
-  function vote(obj, value) {
-    var obj=obj,
-    value=value,
-    votes = {};
-
-    var href = document.location;
-    var id = $(obj).parent().parent().attr("id").substr(1);
-    var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
-    var d = $('article#'+ id + " time").attr("datetime");
-    
-    var cookie_votes = $.cookies.get("NYMPHORTMATION_VOTES", "");
-    if (cookie_votes)
-      votes = JSON.parse(Base64.decode(cookie_votes));
-              
-    if (id in votes) return;
-    
-    var vote = {
-      itemid: id,
-      d: d,
-      v: value,
-      author: { 
-        username: cookie[0],
-        gravatar: cookie[1]
-      },
-      type: "vote",
-    }
-    app.db.saveDoc(vote, {
-      success: function(doc) {
-        votes[id] = value;
-        $.cookies.set("NYMPHORTMATION_VOTES", Base64.encode(JSON.stringify(votes)), "/");
-        document.location = href;
-      }
-    });
-  }
+  
   
   app.view("news",{
     reduce: false,
@@ -449,30 +416,8 @@ function updateChanges(app) {
               
               localizeDates();
 
-              $(".up").click(function(e) {
-                var self = this;
-                app.isLogged(function() {
-                  vote(self, 1);
-                }, function() {
-                  Login(app, {
-                    success: function() {
-                      vote(self, 1);
-                    }
-                  });
-                });
-              });
-              $(".down").click(function(e) {
-                var self = this;
-                app.isLogged(function() {
-                  vote(self, -1);
-                }, function() {
-                  Login(app, {
-                    success: function (){
-                      vote(self, -1);
-                    }
-                  });
-                });
-              });
+              
+              
             }
           }) 
         }
@@ -629,6 +574,85 @@ function fsubcomment(app, obj, link_title) {
      });
   });
   
+}
+
+
+function doVote(app, obj, value) {
+  var app=app,
+  obj=obj,
+  value=value,
+  votes = {};
+
+  var href = document.location;
+  var id = $(obj).attr("id").substr(1);
+  var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
+  var d = $('article#'+ id + " time").attr("datetime");
+  
+  var cookie_votes = $.cookies.get("NYMPHORTMATION_VOTES", "");
+  if (cookie_votes)
+    votes = JSON.parse(Base64.decode(cookie_votes));
+            
+  if (id in votes && value == votes[id]) return;
+  
+  var vote = {
+    itemid: id,
+    d: d,
+    v: value,
+    author: { 
+      username: cookie[0],
+      gravatar: cookie[1]
+    },
+    type: "vote",
+  }
+  
+  app.db.saveDoc(vote, {
+    success: function(doc) {
+      votes[id] = value;
+      $.cookies.set("NYMPHORTMATION_VOTES", Base64.encode(JSON.stringify(votes)), "/");
+      if (value == 1) {
+        $(obj).attr("src", "../../images/vote-arrow-up.png");
+        $(obj).addClass("voted");
+      } else {
+        $(obj).attr("src", "../../images/vote-arrow-up-on.png");
+        try {
+           $(obj).removeClass("voted");
+        } catch (e) {}
+      }
+      //document.location = href;
+    }
+  });
+}
+
+function updateVotes(app, linkid) {
+  app.view("points", {
+    key: linkid,
+    success: function(json) {
+      $("span.vote-count").html(json.rows[0].value);
+    }
+  })
+}
+
+function itemPage(app, linkid, docid) {
+  var app=app,
+  linkid=linkid,
+  docid=docid,
+  votes = {};
+  
+  var cookie_votes = $.cookies.get("NYMPHORTMATION_VOTES", "");
+  if (cookie_votes)
+    votes = JSON.parse(Base64.decode(cookie_votes));
+    
+  if (linkid in votes) {
+    var vote = $("#u"+linkid);
+    vote.attr("src", "../../images/vote-arrow-up.png")
+    vote.addClass("voted");
+  }
+    
+    
+  updateVotes(app, linkid);
+  connectToChanges(app, function() {
+    updateVotes(app, linkid);
+  });
 }
 
 

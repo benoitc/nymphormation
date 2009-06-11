@@ -63,7 +63,7 @@
           <article id="entry">
             <header>
               <% if (doc.title) { %>
-              <h2><a href="<%= doc.url %>"><%= doc.title %></a> <span class="host"><%= doc.domain %></span></h2>
+              <h2><div class="vote"><span class="vote-count"></span><img src="../../images/vote-arrow-up-on.png" alt="up" class="up" id="u<%= doc._id %>"></div><a href="<%= doc.url %>"><%= doc.title %></a> <span class="host"><%= doc.domain %></span></h2>
               <% } %>
               <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="../item/<%= doc._id %>">link</a><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %><% if (!doc.title) { %><span class="link">on <%= link_title %></span><% }%></p>
             </header>
@@ -137,19 +137,22 @@
             var app = app;
             new userNav(app);
             localizeDates();
-            
-           <!-- <% if (!doc.title) { %>
-            
-              app.db.openDoc(doc.linkid, {
-                success: function(doc) {
-                  $("span.link").html(' | on <a href="'
-                  +app.showPath("item", doc._id)+'">'+doc.title+'</a>');
-                }
-              });
-              
-            <% } %>-->
 
-            updateComments(app, "<%= linkid %>", "<%= doc._id %>", "<%= link_title %>");
+            $(".up").click(function(e) {
+              var self = this;
+              var value = 1;
+              if ($(this).hasClass("voted"))
+                value = -1;
+              app.isLogged(function() {
+                doVote(app, self, value);
+              }, function() {
+                Login(app, {
+                  success: function() {
+                    doVote(app, self, value);
+                  }
+                });
+              });
+            });
             
             $("form#fcomment").submit(function() {
               var form = this;
@@ -165,6 +168,9 @@
               });
               return false;
             });
+            updateComments(app, "<%= linkid %>", "<%= doc._id %>", "<%= link_title %>");
+            itemPage(app, "<%= linkid %>", "<%= doc._id %>");
+            
             
             
           });
