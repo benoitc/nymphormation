@@ -534,14 +534,16 @@ function formToDeepJSON(form, fields, doc) {
   });
 };
 
-function submitComment(app, form) {
+function submitComment(app, form, link_title) {
   var href = document.location;
-  var app = app;
+  var app = app,
+  link_title = link_title;
    
   var converter = new Showdown.converter;
   
   var localFormDoc = {
     type: "comment",
+    link_title: link_title
   }
 
   formToDeepJSON(form, ["body", "linkid", "parentid"], localFormDoc);
@@ -579,8 +581,9 @@ function submitComment(app, form) {
      
 }
 
-function fsubcomment(app, obj) {
-  var obj = obj;
+function fsubcomment(app, obj, link_title) {
+  var obj = obj,
+  link_title = link_title;
   app.isLogged(function() {
     var self = obj;
     var link_id = $(self).attr('id');
@@ -610,7 +613,7 @@ function fsubcomment(app, obj) {
     $(cform).append(rsubmit);
     $(cform).submit(function(e) {
         e.preventDefault();
-        submitComment(app, this);
+        submitComment(app, this, link_title);
         return false;
     });
     cdiv = $('<div class="subcomment"></div>');
@@ -629,11 +632,11 @@ function fsubcomment(app, obj) {
 }
 
 
-function updateComments(app, linkid, docid, doc_title) {
+function updateComments(app, linkid, docid, link_title) {
   var docid = docid,
   linkid = linkid,
   app = app,
-  title = doc_title;
+  link_title = link_title;
   
   function children(parentid, rows, comments, idx_comments) {
     for(var v=0; v < rows.length; v++) {
@@ -718,7 +721,7 @@ function updateComments(app, linkid, docid, doc_title) {
       $(".reply").click(function(e) {
         if ($(this).next().is('.subcomment'))
             return false;    
-        new fsubcomment(app, this);
+        new fsubcomment(app, this, link_title);
         return false;
       });
       return true;

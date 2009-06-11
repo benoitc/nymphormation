@@ -65,7 +65,7 @@
               <% if (doc.title) { %>
               <h2><a href="<%= doc.url %>"><%= doc.title %></a> <span class="host"><%= doc.domain %></span></h2>
               <% } %>
-              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="../item/<%= doc._id %>">link</a><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %><% if (!doc.title) { %><span class="link">on </span><% }%></p>
+              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="../item/<%= doc._id %>">link</a><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %><% if (!doc.title) { %><span class="link">on <%= link_title %></span><% }%></p>
             </header>
               <% if (doc.body) { %>
               <div class="text"><%= doc.html %></div>
@@ -130,9 +130,6 @@
       <!-- end script tzgd -->
       
       <script>
-        var linkid = "<%= linkid %>";
-        var username = "<%= username %>";
-        
         var doc = <%= jdoc %>;
         
         $(document).ready(function() {
@@ -141,7 +138,7 @@
             new userNav(app);
             localizeDates();
             
-            <% if (!doc.title) { %>
+           <!-- <% if (!doc.title) { %>
             
               app.db.openDoc(doc.linkid, {
                 success: function(doc) {
@@ -150,19 +147,19 @@
                 }
               });
               
-            <% } %>
+            <% } %>-->
 
-            updateComments(app, "<%= linkid %>", "<%= doc._id %>");
+            updateComments(app, "<%= linkid %>", "<%= doc._id %>", "<%= link_title %>");
             
             $("form#fcomment").submit(function() {
               var form = this;
               app.isLogged(function() {
-                submitComment(app, form);
+                submitComment(app, form, "<%= link_title %>");
               }, function() {
                 Login(app, {
                   success: function() {
                     var cookie = $.cookies.get("NYMPHORMATION_ID", "/").split(";");
-                    submitComment(app, form);
+                    submitComment(app, form, "<%= link_title %>");
                   }
                 });
               });

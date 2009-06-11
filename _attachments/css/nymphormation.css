@@ -173,7 +173,8 @@ section#content {
     font-weight: bold;
 }
 
-article#entry {
+article#entry,
+article.comment {
     display: block;
     border-bottom:5px dashed #EEEEEE;
     padding-bottom:10px;
@@ -263,17 +264,20 @@ li.comment img {
     text-decoration: none;
 }
 
-#entry p.metadata {
+#entry p.metadata
+article.comment p.metadata {
     font-size: 80%;
     
 }
 
-#entry a {
+#entry a,
+article.comment a {
     color: #555c58;
     text-decoration: none;
     padding: 0.2em;
 }
-#entry a:hover {
+#entry a:hover,
+article.comment a:hover;{
     color: #fff;
     background-color: #000;
 }
@@ -485,7 +489,6 @@ aside.sidebar ul.notifications li.footer div p {
 }
 
 
-
 #comments {
     display: block;
     margin-top: 20px;
@@ -505,21 +508,25 @@ li.comment {
     clear: both;
 }
 
-li.comment p.meta {
+li.comment p.meta,
+article.comment p.meta {
     border-bottom:2px dashed #EEEEEE;
     padding-bottom:5px;
 }
 
-li.comment div.text {
+li.comment div.text,
+article.comment div.text {
     padding: 0.3em 0 0.3em 0;
 }
-li.comment div.text a {
+li.comment div.text a,
+article.comment div.text a {
     font-weight: normal;
     color: #555c58;
     text-decoration: none;
 }
 
-li.comment div.text a:hover {
+li.comment div.text a:hover,
+article.comment div.text a:hover {
     background-color: #666;
     color: #fff;
     text-decoration: none;

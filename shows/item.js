@@ -23,12 +23,12 @@ function(doc, req) {
   var parent_url = null;
   var path = null;
   var linkid = null;
+  var link_title = ""
   if (!doc) {
     tpl = templates.edit;
   } else {
     tpl = templates.show;
     var fcreated_at = new Date().setRFC3339(doc.created_at).toLocaleString();
-  
     if (doc.type == "link") {
       linkid = doc._id;
       path = [ linkid ];
@@ -36,9 +36,11 @@ function(doc, req) {
         doc.domain = parseUri(doc.url).domain;
       else
         doc.domain = "";
+      link_title = doc.title
         
     } else {
       linkid = doc.linkid;
+      link_title = doc.link_title,
       path = doc.path;
       path.push(doc._id); 
       parent_url = showPath("item", doc.parentid);
@@ -49,6 +51,7 @@ function(doc, req) {
       doc: doc,
       jdoc: toJSON(doc),
       linkid: linkid,
+      link_title: link_title,
       parent_url: parent_url,
       path: toJSON(path),
       fcreated_at: fcreated_at,
