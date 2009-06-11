@@ -291,23 +291,32 @@ function Login(app, options) {
     bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
     
     if (bValid) {
-      var salt = Math.uuid();
-      var password_hash = b64_sha1(salt + hex_sha1(password.val()));
-      
-      var user = {
-        username: username.val(),
-        email: email.val(),
-        password: password_hash,
-        salt: salt,
-        type: "user"
-      };
-      
-      userdb.saveDoc(user, {
-        success: function() {
-          login(username.val(), password.val());
+      userdb.view("profile/profile", {
+        key: username.val(),
+        success: function(json) {
+          if (json.rows.length >0) {
+            updateTips("Username already exist");
+            
+          } else {
+            var salt = Math.uuid();
+            var password_hash = b64_sha1(salt + hex_sha1(password.val()));
+
+            var user = {
+              username: username.val(),
+              email: email.val(),
+              password: password_hash,
+              salt: salt,
+              type: "user"
+            };
+
+            userdb.saveDoc(user, {
+              success: function() {
+                login(username.val(), password.val());
+              }
+            });
+          }
         }
       });
-      
     }
     return false;
   });
@@ -415,9 +424,6 @@ function updateChanges(app) {
               }
               
               localizeDates();
-
-              
-              
             }
           }) 
         }
@@ -431,7 +437,6 @@ function newestPage(app) {
   connectToChanges(app, function() {
     updateChanges(app);
   });
-  
 }
 
 
@@ -618,7 +623,6 @@ function doVote(app, obj, value) {
            $(obj).removeClass("voted");
         } catch (e) {}
       }
-      //document.location = href;
     }
   });
 }
@@ -647,7 +651,6 @@ function itemPage(app, linkid, docid) {
     vote.attr("src", "../../images/vote-arrow-up.png")
     vote.addClass("voted");
   }
-    
     
   updateVotes(app, linkid);
   connectToChanges(app, function() {
