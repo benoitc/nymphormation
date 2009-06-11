@@ -1,3 +1,4 @@
+      </div>
     </section>
 
     </div>
@@ -52,6 +53,39 @@
             var app = app;
             new userNav(app);
             localizeDates();
+            var ids = [];
+            $('.item').each(function() {
+              ids.push($(this).attr('id'));
+            });
+            
+            app.view("nbcomments", {
+              keys: ids,
+              group: true,
+              success: function(json) {
+                for(var c=0; c<json.rows.length; c++) {
+                  value = json.rows[c].value + " comment";
+                  if (json.rows[c].value > 1)
+                    value +="s";
+                  value = '<a href="../../_show/item/'+ json.rows[c].key +'">'+value+'</a>'
+                  $("#"+json.rows[c].key+" p span.nbcomments").html(value);
+                }
+              }
+            });
+            
+            app.view("points", {
+              keys: ids,
+              group: true,
+              success: function(json) {
+                for(var c=0; c<json.rows.length; c++) {
+                  value = json.rows[c].value + " vote";
+                  if (json.rows[c].value > 1)
+                    value +="s"
+                  value = '<a href="../../_show/item/'+ json.rows[c].key +'">'+value+'</a>'
+                  $("#"+json.rows[c].key+" p span.nbvotes").html(value);
+                }
+              }
+            })
+            
           });
         })
       </script>

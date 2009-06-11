@@ -407,7 +407,8 @@ function updateChanges(app) {
                 return '<article class="item" id="'+news._id+'">'
                 + '<h2><a href="'+ item_url + '">' + news.title + '</a> <span clas="host">'+domain+'</span></h2>'
                 + '<p><span class="author">by <img src="http://www.gravatar.com/avatar/'
-                + news.author.gravatar +'?s=22&amp;d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')+'">'
+                + news.author.gravatar +'?s=22&amp;d=identicon" alt=""> <a href="'+ app.listPath('user', 'links')
+                +'?key='+encodeURIComponent(JSON.stringify(news.author.username))+'">'
                 + news.author.username + '</a></span> '
                 + '<time title="GMT" datetime="' + news.created_at +'" class="caps">'+ fcreated_at + '</time>'
                 + ' <span class="nbcomments"><a href="' + app.showPath("item", news._id) +'">'

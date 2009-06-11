@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+    <title>nymphormation</title>
+    
+    <!--[if IE]>
+
+      <script>
+        // allow IE to recognize HTMl5 elements
+        document.createElement('section');
+        document.createElement('article');
+        document.createElement('aside');
+        document.createElement('footer');
+        document.createElement('header');
+        document.createElement('nav');
+        document.createElement('time');
+
+      </script>
+      <![endif]-->
+    
+    
+    <link rel="stylesheet" href="../../css/black-tie/jquery-ui-custom.css?1.7.1" type="text/css">
+    <link rel="stylesheet" href="../../css/nymphormation.css" type="text/css">
+    <link type='application/atom+xml' href='<%= feedPath %>' rel='alternate' title='<%= username %> links'>
+  </head>
+  <body>
+    <div id="container">
+       <div id="logpanel">
+         <ul>
+           <li class="not_logged_in" style="display: none;"><a href="#" id="login">login</a></li>
+           <li class="logged_in" style="display: none;"><span class="userprofile"></span>, <a href="#" id="logout">logout</a></li>
+         </ul>
+       </div>
+       <header id="mainh">
+         <h1><a href="../../index.html">nymphormation.01</a></h1>
+         <ul>
+           <li><a href="../../index.html">latest</a></li>
+           <li><a href="../../_list/comments/comments?limit=25">comments</a></li>
+           <li><a href="../../_show/item" class="add">add</a></li>
+         </ul>
+       </header>
+
+       <aside class="sidebar">
+          <ul class="notifications"> 
+            <li> 
+          			<div> 
+                    <h3>About Nymphormation</h3> 
+                    <p>Nymphormation is a <a href="http://github.com/couchapp/couchapp">Couchapp</a> that allow people to share links. You can find code on <a href="http://bitbucket.org/benoitc/nymphormation/">bitbucket</a>.</p> 
+          			</div> 
+            </li> 
+
+          	<li class="footer"> 
+          		<div> 
+          			<p>Software Copyright &copy; 2009 <a href="http://benoitc.org">benoît chesneau</a>.</p>
+          			<p>Design by <a href="http://thenonsequitur.org">edna piranha</a></p>
+          		</div> 
+          	</li> 
+          </ul>
+        </aside>
+    <section id="content">
+      <h1><%= username %>' links</h1>
+      <div id="links">
