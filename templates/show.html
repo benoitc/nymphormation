@@ -32,7 +32,7 @@
          </ul>
        </div>
        <header id="mainh">
-         <h1><a href="../../index.html">nymphormation</a></h1>
+         <h1><a href="../../index.html">nymphormation01</a></h1>
          <ul>
            <li><a href="../../index.html">latest</a></li>
            <li><a href="../../_list/comments/comments">comments</a></li>
@@ -41,32 +41,34 @@
        </header>
 
        <aside class="sidebar">
-         <ul class="notifications"> 
-           <li> 
+
+           <ul class="notifications"> 
+             <li> 
          			<div> 
-                   <h3>About Nymphormation</h3> 
+                   <h3>About Nymphormation</h3>
                    <p>Nymphormation is a <a href="http://github.com/couchapp/couchapp">Couchapp</a> that allow people to share links. You can find code on <a href="http://bitbucket.org/benoitc/nymphormation/">bitbucket</a>.</p> 
          			</div> 
-           </li> 
+             </li> 
 
-         	<li class="footer"> 
-         		<div> 
-         			<p>Software Copyright (C) 2009 Benoît Chesneau. Designed by</p> 
-         		</div> 
-         	</li>
-         </ul>
+         	  <li class="footer"> 
+         		  <div> 
+         			  <p>Software Copyright &copy; 2009 <a href="http://benoitc.org">benoît chesneau</a>.</p>
+         			  <p>Design by <a href="http://thenonsequitur.org">edna piranha</a></p>
+         		  </div> 
+         	  </li> 
+           </ul>
        </aside>
       
       <section id="content">
           <article id="entry">
             <header>
               <% if (doc.title) { %>
-              <h2><a href="<%= doc.url %>"><%= doc.title %></a></h2>
+              <h2><a href="<%= doc.url %>"><%= doc.title %></a> <span class="host"><%= doc.domain %></span></h2>
               <% } %>
-              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %></p>
+              <p class="metadata">by <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <%= doc.author.username %> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> | <a href="../item/<%= doc._id %>">link</a><% if (parent_url) { %> | <a href="<%= parent_url %>">parent</a><% } %><% if (!doc.title) { %><span class="link">on </span><% }%></p>
             </header>
               <% if (doc.body) { %>
-              <div><%= doc.body %></div>
+              <div class="text"><%= doc.body %></div>
               <% } %>
             
             <p id="validateTips"></p>
@@ -137,6 +139,17 @@
             var app = app;
             new userNav(app);
             localizeDates();
+            
+            <% if (!doc.title) { %>
+            
+              app.db.openDoc(doc.linkid, {
+                success: function(doc) {
+                  $("span.link").html(' | on <a href="'
+                  +app.showPath("item", doc._id)+'">'+doc.title+'</a>');
+                }
+              });
+              
+            <% } %>
 
             updateComments(app, "<%= linkid %>", "<%= doc._id %>");
             

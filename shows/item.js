@@ -7,6 +7,8 @@ function(doc, req) {
   // !json templates.edit
   // !json templates.show
   
+  
+  
   // redirect to homepage if not authenticated
   if (!doc && (typeof req.userCtx['name'] == "undefined" || ! req.userCtx['name'])) {
     return {
@@ -26,11 +28,15 @@ function(doc, req) {
   } else {
     tpl = templates.show;
     var fcreated_at = new Date().setRFC3339(doc.created_at).toLocaleString();
-   
-    
+  
     if (doc.type == "link") {
       linkid = doc._id;
       path = [ linkid ];
+      if (doc.url)
+        doc.domain = parseUri(doc.url).domain;
+      else
+        doc.domain = "";
+        
     } else {
       linkid = doc.linkid;
       path = doc.path;
