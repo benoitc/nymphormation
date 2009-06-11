@@ -1,10 +1,52 @@
 function(head, row, req, row_info) {
- // !code vendor/couchapp/path.js
- // !code vendor/couchapp/date.js
+  // !json templates.links
+  // !code helpers/ejs/ejs.js
+  // !code helpers/template.js
+  // !code vendor/couchapp/path.js
+  // !code vendor/couchapp/date.js
+  // !code vendor/couchapp/json2.js
  
- var feedPath = listPath('links','news',{descending:true, limit:25, reduce: false, format:"atom"});
+ var feedPath = listPath('links','news',{descending:true, limit:25,  format:"atom"});
  
  return respondWith(req, {
+   html: function() {
+       if (head) {
+         return template(templates.links.head, {
+           username: req.userCtx.name,
+           feedPath: feedPath
+         });
+       } else if (row) {
+         if (row_info.row_number > 9)
+              return {stop: true}
+
+         var item_url = row.value.url || showPath("item", row.id);
+         var fcreated_at = new Date().setRFC3339(row.value.created_at).toLocaleString();
+         if (row.value['url'])
+           row.value['domain'] =  parseUri(row.value['url']).domain;
+         else
+           row.value['domain'] = "";
+
+         return template(templates.links.row, {
+           doc: row.value,
+           fcreated_at: fcreated_at,
+           item_url: item_url
+         });
+       } else {
+         if (row_info.row_number == 10) {
+            next = listPath('links','news', {
+               descending:true, 
+               limit:11,
+               startkey: row_info.prev_key
+             })
+          } else {
+            next = false;
+          }
+         return template(templates.links.tail, {
+           username: req.userCtx.name,
+           next:next
+         });
+       }
+     },
    atom: function() {
      // with first row in head you can do updated.
      if (head) {

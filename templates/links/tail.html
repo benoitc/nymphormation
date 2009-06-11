@@ -1,6 +1,7 @@
-    <% if (next) { %>
-    <div class="next"><a href="<%= next %>">next</a></div>
-    <% } %>
+      <% if (next) { %>
+      <div class="next"><a href="<%= next %>">next</a></div>
+      <% } %>
+      </div>
     </section>
 
     </div>
@@ -13,7 +14,7 @@
        <form id="fsignup">
          <ul>
      		  <li><label for="username">Username:</label><input type="text" name="username" id="username" class="text ui-widget-content ui-corner-all" value="" /></li>
-     		  <li><label for="password">Password:</label><input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" value="" /></li>
+     		  <li><label for="password">Password:</label><input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" /></li>
      		  <li><label for="email">Email:</label><input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" /></li>
      		  <li><input id="signupbutton" type="submit" class="nf-button ui-state-default ui-corner-all" value="create this account"></li>
      	  </ul>
@@ -55,6 +56,41 @@
             var app = app;
             new userNav(app);
             localizeDates();
+            var ids = [];
+            $('.item').each(function() {
+              ids.push($(this).attr('id'));
+            });
+            
+            app.view("nbcomments", {
+              keys: ids,
+              group: true,
+              success: function(json) {
+                for(var c=0; c<json.rows.length; c++) {
+                  value = json.rows[c].value + " comment";
+                  if (json.rows[c].value > 1)
+                    value +="s";
+                  value = '<a href="../../_show/item/'+ json.rows[c].key +'">'+value+'</a>'
+                  $("#"+json.rows[c].key+" p span.nbcomments").html(value);
+                }
+              }
+            });
+            
+            app.view("points", {
+              keys: ids,
+              group: true,
+              success: function(json) {
+                for(var c=0; c<json.rows.length; c++) {
+                  value = json.rows[c].value + " vote";
+                  if (json.rows[c].value > 1)
+                    value +="s"
+                  value = '<a href="../../_show/item/'+ json.rows[c].key +'">'+value+'</a>'
+                  $("#"+json.rows[c].key+" p span.nbvotes").html(value);
+                }
+              }
+            });
+            
+            newestPage(app);
+            
           });
         })
       </script>

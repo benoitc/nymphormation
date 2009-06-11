@@ -7,7 +7,7 @@ function(head, row, req, row_info) {
  // !code vendor/couchapp/json2.js
  
  var feedPath = listPath('comments','comments',{descending:true, limit:25, format:"atom"});
- var feedLinksPath = listPath('links','news',{descending:true, limit:25, reduce:false, format:"atom"});
+ var feedLinksPath = listPath('links','news',{descending:true, limit:25,  format:"atom"});
  
  return respondWith(req, {
    html: function() {

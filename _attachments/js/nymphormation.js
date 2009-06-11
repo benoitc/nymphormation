@@ -358,13 +358,12 @@ function updateChanges(app) {
     }
   }
   
-  var next = query["next"] || false;
+  var next = query["key"] || false;
   startkey = [{}, {}];
   if (next)
     startkey = JSON.parse(decodeURI(next).replace("%2C", ","));
   
   app.view("news",{
-    reduce: false,
     startkey: startkey,
     endkey: [],
     descending: true,
@@ -372,7 +371,9 @@ function updateChanges(app) {
     success: function(data) {
       var ids = [];
       
-      $("#links").html(data.rows.map(function(row) {
+      $("#links").html(data.rows.map(function(row, idx) {
+        if (idx == 10)
+         return ''
         var news = row.value;
         ids.push(row.value['_id']);
         if (news.url)
@@ -397,8 +398,8 @@ function updateChanges(app) {
       
       if (data.rows.length == 11) {
         var params_string = "?next=" + encodeURIComponent(toJSON(data.rows[data.rows.length-1].key));
-        var next = $('<div class="next"><a href="index.html'
-        + params_string +'">next</a></div>');
+        var next = $('<div class="next"><a href="'+ app.listPath("links", "news")
+        + encodeOptions({key: data.rows[data.rows.length-1].key, descending: true, limit: 11 }) +'">next</a></div>');
         $("#links").append(next);
       }
       
@@ -439,7 +440,7 @@ function updateChanges(app) {
 }
 
 function newestPage(app) {
-  updateChanges(app);
+  
   connectToChanges(app, function() {
     updateChanges(app);
   });
