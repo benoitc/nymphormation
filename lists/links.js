@@ -30,11 +30,12 @@ function(head, row, req, row_info) {
        
        var entry = <entry/>;
        entry.id = makeAbsolute(req, showPath("item", row.id));
-       entry.title = row.value.title + " by " + row.value.author.username;
+       entry.title = row.value.title;
        entry.content = content;
        entry.content.@type = 'html';
        entry.updated = row.value.created_at;
        entry.author = <author><name>{row.value.author.username}</name></author>;
+       entry.link += <link href={url}></link>;       
        entry.link += <link href={makeAbsolute(req, showPath('item', row.id))} rel={"alternate"} type={"text/html"} title={"Comments"}></link>;       
        return {body:entry};
      } else {
