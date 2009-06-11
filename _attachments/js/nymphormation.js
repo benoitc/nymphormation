@@ -718,8 +718,8 @@ function updateComments(app, linkid, docid, link_title) {
       var fcreated_at = new Date().setRFC3339(c.created_at).toLocaleString();
       ret += '<li class="comment" id="'+c._id + '">'
       + '<p class="meta">by <img src="http://www.gravatar.com/avatar/'
-      + c.author.gravatar +'?s=22&amp;d=identicon" alt=""><a href="'
-      + app.listPath('user', 'links')+'?key='+c.author.username+'">'
+      + c.author.gravatar +'?s=22&amp;d=identicon" alt=""><a href=\''
+      + app.listPath('user', 'links')+'?key="'+c.author.username+'"\'>'
       + c.author.username + '</a> '
       + '<time title="GMT" datetime="' + c.created_at + '" class="caps">'
       + fcreated_at + '</time></p>'
