@@ -167,6 +167,9 @@
                   username: cookie[0],
                   gravatar: cookie[1]
                 }
+                if (doc.url && doc.body)
+                  doc.body = "";
+                  
                 if (doc.body) {
                   doc.html = converter.makeHtml(escapeHTML(doc.body));
                 }
