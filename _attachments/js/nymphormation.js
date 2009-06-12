@@ -627,15 +627,7 @@ function doVote(app, obj, value) {
     success: function(doc) {
       votes[id] = value;
       $.cookies.set("NYMPHORTMATION_VOTES", Base64.encode(JSON.stringify(votes)), "/");
-      if (value == 1) {
-        $(obj).attr("src", "../../images/vote-arrow-up.png");
-        $(obj).addClass("voted");
-      } else {
-        $(obj).attr("src", "../../images/vote-arrow-up-on.png");
-        try {
-           $(obj).removeClass("voted");
-        } catch (e) {}
-      }
+      document.location = href;
     }
   });
 }
