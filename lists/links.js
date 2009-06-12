@@ -33,7 +33,7 @@ function(head, row, req, row_info) {
            item_url: item_url
          });
        } else {
-         if (row_info.row_number == 10) {
+         if (row_info.row_number == 11) {
             next = listPath('links','news', {
                descending:true, 
                limit:11,
