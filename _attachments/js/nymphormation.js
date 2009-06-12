@@ -344,7 +344,6 @@ function parseUri(sourceUri){
 
 
 function updateChanges(app) {
-  
   var app = app;
   
   var href = document.location.href;
@@ -799,7 +798,9 @@ function userNav(app) {
   var href = document.location;
   app.isLogged(function(data) {
      // get user profile
-     $('.userprofile').autoRender({ userprofile: data.userCtx.name })
+     //$('.userprofile').autoRender({ userprofile: data.userCtx.name })
+     $('.userprofile').html(data.userCtx.name);
+     
      $(".logged_in").show();
    }, function() {
      $(".not_logged_in").show();
