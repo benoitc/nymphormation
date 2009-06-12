@@ -133,7 +133,6 @@
 
             function checkLength(v, n, min, max) {
                 if (v.length > max || v.length < min) {
-                    o.addClass('ui-state-error');
                     updateTips("Length of " + n + " must be between " + min + " and " + max + ".");
                     return false;
                 } else {
@@ -153,7 +152,7 @@
                     updateTips("Title required");
                     return false;
                   }
-                  checkLength(doc.title, "title", 3, 50);
+                  checkLength(doc.title, "title", 3, 100);
                   if (!doc.body && !doc.url) {
                     updateTips("Text or Url are empty.");
                     return false;
