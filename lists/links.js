@@ -28,6 +28,7 @@ function(head, row, req, row_info) {
 
          return template(templates.links.row, {
            doc: row.value,
+           author: toJSON(row.value.author.username),
            fcreated_at: fcreated_at,
            item_url: item_url
          });

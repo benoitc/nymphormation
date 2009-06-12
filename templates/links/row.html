@@ -1,6 +1,5 @@
 <article class="item" id="<%= doc._id %>">
   <h2><a href="<%= item_url %>"><%= doc.title %></a> <span clas="host"><%= doc.domain %></span></h2>
-  <p>
-    <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> <span class="nbcomments"><a href="../../_show/item/<%= doc._id %>">0 comments</a></span> <span class="nbvotes"><a href="../../_show/item/<%= doc._id %>">0 votes</a></span>
+  <p><span class="author">by  <img src="http://www.gravatar.com/avatar/<%= doc.author.gravatar %>?s=16&amp;d=identicon" alt=""> <a href='../user/links?key="<%= doc.author.username %>"'><%= doc.author.username %></a> <time title="GMT" datetime="<%= doc.created_at %>" class="caps"><%= fcreated_at %></time> <span class="nbcomments"><a href="../../_show/item/<%= doc._id %>">0 comments</a></span> <span class="nbvotes"><a href="../../_show/item/<%= doc._id %>">0 votes</a></span>
   </p>
 </article>
