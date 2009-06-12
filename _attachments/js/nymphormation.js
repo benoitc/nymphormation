@@ -359,7 +359,7 @@ function updateChanges(app) {
   }
   
   var next = query["key"] || false;
-  startkey = [{}, {}];
+  startkey = [];
   if (next)
     startkey = JSON.parse(decodeURI(next).replace("%2C", ","));
   
