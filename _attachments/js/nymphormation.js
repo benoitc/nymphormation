@@ -390,7 +390,7 @@ function updateChanges(app) {
   
   var next = query["key"] || false;
   var options = {}
-  if (next)
+  if (next) {
      var ids = [];
       $('.item').each(function() {
           ids.push($(this).attr('id'));
