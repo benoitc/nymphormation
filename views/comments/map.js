@@ -1,5 +1,5 @@
 function(doc) {
   if (doc.type == "comment") {
-    emit([doc.linkid, doc._local_seq], doc);
+    emit([doc._local_seq, doc.linkid], doc);
   }
 }
