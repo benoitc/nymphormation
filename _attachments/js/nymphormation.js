@@ -388,7 +388,7 @@ function updateChanges(app) {
   }
 
   
-  var next = query["key"] || false;
+  var next = query["startkey"] || false;
   var options = {}
   if (next) {
      var ids = [];
