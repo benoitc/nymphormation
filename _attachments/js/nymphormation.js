@@ -341,7 +341,7 @@ function parseUri(sourceUri){
     return uri;
 }
 
-function updateComments(app, ids) {
+function updatenbComments(app, ids) {
   app.view("nbcomments", {
     keys: ids,
     group: true,
@@ -357,7 +357,7 @@ function updateComments(app, ids) {
   });
 }
 
-function updateVotes(app, ids) {
+function updatenbVotes(app, ids) {
   app.view("points", {
     keys: ids,
     group: true,
