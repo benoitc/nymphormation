@@ -398,7 +398,7 @@ function updateChanges(app) {
       updateComments(app, ids);
       updateVotes(app, ids);    
       
-  else {
+  } else {
     
     app.view("news", {
       descending: true,
