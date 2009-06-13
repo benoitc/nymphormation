@@ -445,8 +445,8 @@ function updateChanges(app) {
           }
           localizeDates();
         }
-        updateComments(app, ids);
-        updateVotes(app, ids);
+        updatenbComments(app, ids);
+        updatenbVotes(app, ids);
       }
     });
     
