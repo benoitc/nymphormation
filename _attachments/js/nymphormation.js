@@ -395,8 +395,8 @@ function updateChanges(app) {
       $('.item').each(function() {
           ids.push($(this).attr('id'));
       });
-      updateComments(app, ids);
-      updateVotes(app, ids);    
+      updatenbComments(app, ids);
+      updatenbVotes(app, ids);    
       
   } else {
     
