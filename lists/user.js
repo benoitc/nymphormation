@@ -1,4 +1,4 @@
-function(head, row, req, row_info) {
+function(head, req) {
   // !json templates.user
   // !code helpers/ejs/ejs.js
   // !code helpers/template.js
@@ -16,12 +16,14 @@ function(head, row, req, row_info) {
  return respondWith(req, {
    
    html: function() {
-      if (head) {
-        return template(templates.user.head, {
+     send(template(templates.user.head, {
           username: username,
           feedPath: feedPath
-        });
-      } else if (row) {
+      }));
+      
+      var row, key,
+      i = 0;
+      while (row = getRow()) {
 
         var item_url = row.value.url || showPath("item", row.id);
         var fcreated_at = new Date().setRFC3339(row.value.created_at).toLocaleString();
@@ -30,31 +32,29 @@ function(head, row, req, row_info) {
         else
           row.value['domain'] = "";
           
-        return template(templates.user.row, {
+        send(template(templates.user.row, {
           doc: row.value,
           fcreated_at: fcreated_at,
           item_url: item_url
-        });
-      } else {
-        return template(templates.user.tail, {
-          username: username
-        });
+        }));
       }
+      return template(templates.user.tail, {
+          username: username
+      });
     },
     
    atom: function() {
      // with first row in head you can do updated.
-     if (head) {
-       var f = <feed xmlns="http://www.w3.org/2005/Atom"/>;
-       f.title = "nymphormation01 - " + username + " links";
-       f.id = makeAbsolute(req, "index.html");
-       f.link.@href = makeAbsolute(req, feedPath);
-       f.link.@rel = "self";
-       f.generator = 'nymphormation.org';
-       f.updated = new Date().rfc3339();
-       return {body: '<?xml version="1.0" encoding="UTF-8"?>\n'+
-           f.toXMLString().replace(/\<\/feed\>/,'')};
-     } else if (row) {
+     var f = <feed xmlns="http://www.w3.org/2005/Atom"/>;
+     f.title = "nymphormation01 - " + username + " links";
+     f.id = makeAbsolute(req, "index.html");
+     f.link.@href = makeAbsolute(req, feedPath);
+     f.link.@rel = "self";
+     f.generator = 'nymphormation.org';
+     f.updated = new Date().rfc3339();
+     send('<?xml version="1.0" encoding="UTF-8"?>\n'+
+         f.toXMLString().replace(/\<\/feed\>/,''));
+     while (row = getRow()) {
        var url = "";
        if (row.value.url) {
          url = row.value.url;
@@ -74,10 +74,9 @@ function(head, row, req, row_info) {
        entry.author = <author><name>{row.value.author.username}</name></author>;
        entry.link += <link href={url}></link>;       
        entry.link += <link href={makeAbsolute(req, showPath('item', row.id))} rel={"alternate"} type={"text/html"} title={"Comments"}></link>;       
-       return {body:entry};
-     } else {
-       return {body: "</feed>"};
-     }
+       send(entry);
+     } 
+     return "</feed>";
    }
  });
 }
