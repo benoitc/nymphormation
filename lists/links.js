@@ -6,7 +6,7 @@ function(head, req) {
   // !code vendor/couchapp/date.js
   // !code vendor/couchapp/json2.js
   
-  req.userCtx = { name: ""}
+  req.userCtx = { name: ""};
 
   var feedPath = listPath('links','news',{descending:true, limit:25,  format:"atom"});
 
@@ -48,7 +48,7 @@ function(head, req) {
                   descending:true, 
                   limit:11,
                   startkey: key
-         })
+         });
        } else {
          next = false;
        }
@@ -70,7 +70,7 @@ function(head, req) {
     f.updated = new Date().rfc3339();
     send('<?xml version="1.0" encoding="UTF-8"?>\n'+
            f.toXMLString().replace(/\<\/feed\>/,''));
-    for (row = getRow()) {
+    while (row = getRow()) {
       var url = "";
        if (row.value.url) {
          url = row.value.url;
@@ -99,7 +99,7 @@ function(head, req) {
      //sitemap
      send('<?xml version="1.0" encoding="UTF-8"?>\n'+
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');
-     for (row=getRow()) {
+     while (row=getRow()) {
        var url = <url/>;
        url.loc = makeAbsolute(req, showPath('item', row.id));
        url.lastmod = row.value.created_at;

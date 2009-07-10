@@ -288,7 +288,7 @@ function toJSON(obj) {
         var userdb = options.userdb || dbname;
         $.ajax({
           type: "POST",
-          url: "/" + userdb + "/_login",
+          url: "/_session",
           data: { username: username, password: password },
           beforeSend: function(req) {
             req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
@@ -310,7 +310,7 @@ function toJSON(obj) {
         options = options || {};
         var userdb = options.userdb || dbname;
         $.ajax({
-          type: "POST", url: "/" + userdb  + "/_logout", dataType: "json",
+          type: "DELETE", url: "/_session", dataType: "json",
           beforeSend: function(req) {
             req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
           },
@@ -344,13 +344,15 @@ function toJSON(obj) {
             replace(/\-{2,}/,'-');
         },
         isLogged: function(loggedIn, loggedOut) {
-          $.getJSON(this.showPath('userctx', ""), function(data) {
-            if (data.is_logged) {
+          $.getJSON("/_session", function(data) {
+            if (data.name) {
               loggedIn && loggedIn(data);
             } else {
               loggedOut && loggedOut();
             }
           });
+          
+          
         },
         name: dname,
         db : db,

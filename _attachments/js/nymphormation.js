@@ -207,7 +207,7 @@ function Login(app, options) {
   var app = app;
   var options = options || {};
   var tips = $("#signup-tips");
-  var userdb = $.couch.db("user");
+  var userdb = $.couch.db("users");
   
   function updateTips(t) {
       tips.text(t).fadeIn(1500);
@@ -235,7 +235,7 @@ function Login(app, options) {
   
   function login(username, password) {
     app.login({
-      userdb: "user",
+      userdb: "users",
       username: username,
       password: password,
       success: function() {
@@ -796,7 +796,7 @@ function userNav(app) {
   app.isLogged(function(data) {
      // get user profile
      //$('.userprofile').autoRender({ userprofile: data.userCtx.name })
-     $('.userprofile').html(data.userCtx.name);
+     $('.userprofile').html(data.name);
      
      $(".logged_in").show();
    }, function() {
@@ -813,13 +813,14 @@ function userNav(app) {
    });
    
    $("#logout").click(function() {
+     var href = document.location.href;
      app.logout({
        userdb: "user",
        success: function() {
          try {
            $.cookies.remove("NYMPHORMATION_ID", "/");
          } catch (e) {}
-         document.location = "/" + app.db.name + "/_design/" + app.name + "/index.html";
+         document.location = href;
        }
      });
    });
