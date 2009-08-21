@@ -37,7 +37,7 @@ function(head, req) {
           descending:true, 
           limit:26,
           startkey: key
-        })
+        });
      } else {
        next = false;
      }
@@ -68,7 +68,7 @@ function(head, req) {
        entry.author = <author><name>{row.value.author.username}</name></author>;
        entry.link.@href = makeAbsolute(req, showPath('item', row.id));
        entry.link.@rel = "alternate";
-       send(entry):
+       send(entry);
      } 
      return "</feed>";
    },
