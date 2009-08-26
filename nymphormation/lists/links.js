@@ -6,17 +6,15 @@ function(head, req) {
   // !code vendor/couchapp/date.js
   // !code vendor/couchapp/json2.js
   
-  req.userCtx = { name: ""};
 
   var feedPath = listPath('links','news',{descending:true, limit:25,  format:"atom"});
 
-  return respondWith(req, {
-    html: function() {
-
+  provides("html", function() {
       send(template(templates.links.head, {
-        username: req.userCtx.name,
+        username: req.userCtx.name || "",
         feedPath: feedPath
       }));
+      
       var row, key, first_key,
       i = 0;
       while (row = getRow()) {
@@ -53,12 +51,13 @@ function(head, req) {
          next = false;
        }
        return template(templates.links.tail, {
-         username: req.userCtx.name,
+         username: req.userCtx.name || "",
          next:next,
-         first_key: toJSON(first_key)
+         first_key: toJSON(first_key || null)
        });
-  },
-  atom: function() {
+  });
+  
+  provides("atom", function() {
     // with first row in head you can do updated.
      
     var f = <feed xmlns="http://www.w3.org/2005/Atom"/>;
@@ -70,6 +69,7 @@ function(head, req) {
     f.updated = new Date().rfc3339();
     send('<?xml version="1.0" encoding="UTF-8"?>\n'+
            f.toXMLString().replace(/\<\/feed\>/,''));
+           
     while (row = getRow()) {
       var url = "";
        if (row.value.url) {
@@ -94,8 +94,9 @@ function(head, req) {
     }
 
     return "</feed>";
-   },
-   sitemap: function() {
+   });
+   
+   provides("sitemap", function() {
      //sitemap
      send('<?xml version="1.0" encoding="UTF-8"?>\n'+
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');
@@ -108,7 +109,6 @@ function(head, req) {
        return {body:url};
      }
      return "</urlset>";
-   }
+   });
    
- });
 }

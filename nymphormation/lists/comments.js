@@ -9,10 +9,9 @@ function(head, req) {
  var feedPath = listPath('comments','comments',{descending:true, limit:25, format:"atom"});
  var feedLinksPath = listPath('links','news',{descending:true, limit:25,  format:"atom"});
  
- return respondWith(req, {
-   html: function() {
+ provides("html", function() {
      send(template(templates.comments.head, {
-         username: req.userCtx['name'],
+         username: req.userCtx.name || "",
          feedPath: feedPath
      }));
      var row, key,
@@ -42,11 +41,13 @@ function(head, req) {
        next = false;
      }
      return template(templates.comments.tail, {
-       username: req.userCtx['name'],
+       username: req.userCtx.name || "",
        next: next
      });
-   },
-   atom: function() {
+   });
+   
+   
+  provides("atom", function() {
      // with first row in head you can do updated.
      
       var f = <feed xmlns="http://www.w3.org/2005/Atom"/>;
@@ -71,8 +72,8 @@ function(head, req) {
        send(entry);
      } 
      return "</feed>";
-   },
-   sitemap: function() {
+   });
+   provides("sitemap", function() {
     //sitemap
     send('<?xml version="1.0" encoding="UTF-8"?>\n'+
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');
@@ -86,7 +87,5 @@ function(head, req) {
     } 
     return "</urlset>";
 
-  }
-   
- })
+  });
 }

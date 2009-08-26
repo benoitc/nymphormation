@@ -283,7 +283,7 @@ function toJSON(obj) {
       function login(options) {
         options = options || {};
         var username = options.username, 
-        password = hex_sha1(options.password);
+        password = options.password;
         
         var userdb = options.userdb || dbname;
         $.ajax({
