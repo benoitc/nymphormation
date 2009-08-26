@@ -13,9 +13,7 @@ function(head, req) {
    format:"atom"
  });
  
- return respondWith(req, {
-   
-   html: function() {
+   provides("html", function() {
      send(template(templates.user.head, {
           username: username,
           feedPath: feedPath
@@ -41,9 +39,9 @@ function(head, req) {
       return template(templates.user.tail, {
           username: username
       });
-    },
+    });
     
-   atom: function() {
+   provides("atom", function() {
      // with first row in head you can do updated.
      var f = <feed xmlns="http://www.w3.org/2005/Atom"/>;
      f.title = "nymphormation01 - " + username + " links";
@@ -77,6 +75,5 @@ function(head, req) {
        send(entry);
      } 
      return "</feed>";
-   }
- });
+    });
 }
