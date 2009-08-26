@@ -117,7 +117,7 @@ function Login(app, options) {
         });
         
       },
-      error: function(s, e, r) {
+      error: function(d) {
         $("#login-popup").jqmHide();
         alert("An error occurred logging in: " + r);
       }

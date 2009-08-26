@@ -289,19 +289,17 @@ function toJSON(obj) {
         $.ajax({
           type: "POST",
           url: "/_session",
+          dataType: "json",
           data: { username: username, password: password },
           beforeSend: function(req) {
             req.setRequestHeader('X-CouchDB-WWW-Authenticate', 'Cookie');
           },
-          complete: function(req) {
-            var resp = $.httpData(req, "json");
-            if (req.status == 200) {
-              if (options.success) options.success(resp);
-            } else if (options.error) {
-              options.error(req.status, resp.error, resp.reason);
+          success: function(data) {
+            if (data.ok) {
+              if (options.success) options.success(data);
             } else {
-              alert("An error occurred logging in: " + resp.reason);
-            }
+              options.error(data);
+            } 
           }
         });
       };
