@@ -1,3 +1,8 @@
+/* 
+ This file is part of nymphormation released under the Apache2 license. 
+ See the NOTICE for more information. */
+
+
 function(head, req) {
  // !json templates.comments
  // !code helpers/ejs/ejs.js

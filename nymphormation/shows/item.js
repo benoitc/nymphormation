@@ -1,3 +1,8 @@
+/* 
+ This file is part of nymphormation released under the Apache2 license. 
+ See the NOTICE for more information. */
+
+
 function(doc, req) {
   // !code helpers/ejs/ejs.js
   // !code helpers/template.js
